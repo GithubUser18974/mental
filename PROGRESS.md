@@ -10,7 +10,7 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 
 ## Current status
 
-- **Active task:** T2.6 — awaiting user review (next: Phase 3, T3.1). T2.5 + T2.6 built in one autonomous session (user: "proceed until 3 pm").
+- **Active task:** T3.1 — awaiting user review (next: T3.2)
 - **Last updated:** 2026-11-26
 
 ---
@@ -41,13 +41,13 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 | T2.3 | Backend follows, blocks (enforced across feed/search/comments/reactions/profiles), search & discovery | ✅ |
 | T2.4 | Backend reports (posts/comments/profiles, reasons) → moderation queue | ✅ |
 | T2.5 | Flutter: community home, feed, post details, create/edit post (category grid), comments, reactions | ✅ |
-| T2.6 | Flutter: topic discovery, search, saved posts, followers/following, public profile, report & block flows | 🔍 |
+| T2.6 | Flutter: topic discovery, search, saved posts, followers/following, public profile, report & block flows | ✅ |
 
 ## Phase 3 — Mental Health Tracking
 
 | ID | Task | Status |
 |---|---|---|
-| T3.1 | Backend moods, symptoms (categories), sleep, edit/delete, `/tracking/overview`, insights (queued, non-diagnostic) | ⬜ |
+| T3.1 | Backend moods, symptoms (categories), sleep, edit/delete, `/tracking/overview`, insights (queued, non-diagnostic) | 🔍 |
 | T3.2 | Flutter: daily check-in, mood selection, mood history, symptom & sleep tracking, insights | ⬜ |
 
 ## Phase 4 — Medication
@@ -153,6 +153,8 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 | 2026-11-26 | Reports live in the new **Moderation** module (`reports`: polymorphic target post/comment/profile, no FK so reports survive deletion, owner profile captured at report time). Reasons = SRS FR-COM-010 list (`other` requires details ≤ 500). **Priority from reason**: suicidal content / self-harm encouragement = critical, harassment / dangerous medical advice = high, spam / other = normal; response flags `crisis_support` for critical reasons (app shows crisis resources, FR-SAFETY-002). One pending report per member per target (partial unique index; repeat → 200 with existing). Only visible targets reportable (404 otherwise); own content → 422; a profile you blocked stays reportable. Reporter never revealed; details never logged. **No automatic hiding** on report counts (SRS: automation must not be the sole basis for decisions) — moderators decide in T8.1. Queue = pending reports grouped per target, critical → most reporters → oldest (`BuildReportQueue`). `ContentReported` event for the T8.1 safety workflow. |
 | 2026-11-26 | Mobile shell: bottom navigation (Community, Me); Me = identity + sign-out until T2.6/Phase 10. Community = greeting + disclaimer ("personal experiences, not medical advice", BR-011) + segmented Recent/Popular/Following + category chips + feed. Posts render through one **post store** (optimistic reactions/saves, edits, deletes, comment counts update every screen; reverted on failure). Feed → detail hands the post over for instant display. Content warnings blur posts until "Show post"; suicide/self-harm also show a gentle "contact emergency services / someone you trust" hint. Comment edit/delete in a menu; reply-to chip; removed comments as placeholders. |
 | 2026-11-26 | **Image upload in the composer is pending** — needs `image_picker` (not in the agreed stack; asked the user). Existing post images display (signed URLs; calm placeholder when expired). Interests step in onboarding moved to T2.6 (with discovery). |
+| 2026-11-26 | Tracking data belongs to the **account** (`user_id`), never the anonymous profile; community/moderation/identity can't use the module (arch test). Check-in = `mood` (required, 5 SRS options) + optional 1–10 score/anxiety/stress/energy + notes. Multiple check-ins per day allowed. Symptoms: admin-configurable categories (8 SRS examples seeded) + severity 1–10, optional duration (≤ 7 days) and notes. Sleep: duration (≤ 24 h) + optional quality; attributed to the wake-up day. Notes encrypted at rest; entries **hard-deleted** on delete; history filters by local days in the member's timezone (`user_preferences.timezone`, via Identity `AccountPreferences`). |
+| 2026-11-26 | Insights (FR-TRACK-005): recomputed by a queued, unique, after-commit job (account id only) after every change; stored encrypted as `{key, params}` and rendered in the reader's language, always with a "not a medical assessment" disclaimer. Rules (product choices — review): trends compare last 14 days vs the 14 before, need ≥ 3 entries in each, "higher/lower" at ≥ 0.75 points; most frequent mood (30 days, ≥ 3 entries, ties → most recent); sleep pattern = mood after ≥ 7 h vs < 6 h sleep (≥ 3 days each, worded as a pattern, never a cause); milestones = first check-in, 7-day streak, 30 check-ins (habit only, never "recovery"). Streak = consecutive local days, not broken until the day ends. |
 | 2026-11-12 | CI = GitHub Actions (backend + mobile workflows, path-filtered) + Dependabot. Deploy stages (SRS §14.3 steps 8–9) deferred to T11.2 (no hosting chosen yet). Android APK build runs on pushes only, not PRs. |
 | 2026-11-12 | Debug-only `/dev/design` showcase route; welcome "Get started" opens it until T1.3. Android debug build allows cleartext to local API; iOS `NSAllowsLocalNetworking`. |
 
@@ -292,3 +294,10 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
   - Tests: 12 new flow tests (report + crisis dialog + details rule, profile follow/block/self, saved, blocked → unblock, followers empty, trending → hashtag feed, post & people search, min length). `flutter test` 107/107, analyze 0, format clean.
   - Verified on the emulator against the Docker API: report menus, profile → Follow (count 0 → 1, "Following ✓", posts listed), search with trending hashtags (warned post's hashtag excluded, Arabic tag shown). Screenshots in `docs/screenshots/t2.6/`.
   - Not done in T2.6 (carried over): interests step in onboarding + public interests on profiles (needs a backend endpoint respecting profile privacy); image upload (needs `image_picker` decision).
+- First git commit `93c27d8` (Phases 0–2) at the user's request. `health/` (empty folder with an empty nested git repo, not created by Claude) left untracked.
+- **T2.6 approved** ("continue"). Started T3.1.
+- **T3.1 finished** (awaiting review):
+  - New `app/Modules/Tracking`: migration (mood/symptom/sleep entries with CHECK ranges, symptom categories seeded en/ar, `tracking_insights`), models with `ownedBy()` scope + factories, `Mood` enum, `TrackingEntries` (owner-scoped CRUD, hard delete, dispatches refresh), `BuildOverview`, `ComputeInsights`, `RefreshInsights` job (unique, after commit, retries), `LocalDays` (timezone days, streak). Identity gains `AccountPreferences::timezone()`.
+  - Endpoints (SRS §8.5): `GET|POST /tracking/moods`, `GET|PUT|DELETE /tracking/moods/{id}`, same for `symptoms` and `sleep`, `GET /tracking/symptom-categories`, `GET /tracking/overview`, `GET /tracking/insights`. New `tracking` rate limit (60/min). OpenAPI: 15 operations + schemas, `Tracking` tag.
+  - Tests: 46 new (SRS §13.3 #3 cross-user 404 for all entry types, #10 invalid mood scores, partial edit, hard delete, encryption at rest, timezone day filtering, categories active/localized, symptom & sleep validation, overview incl. other users' data excluded, streak, insight rules & minimum data, non-diagnostic wording check en, ar rendering, queued job carries no health data, insights owner-only).
+  - Verified: `composer ci` ✔ (pint, phpstan 0, pest 344/344, audit); live smoke test with the real Redis queue worker (check-in + sleep + symptom → insights computed in the background, overview averages, notes encrypted in Postgres).

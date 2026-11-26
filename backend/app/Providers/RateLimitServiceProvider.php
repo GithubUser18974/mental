@@ -37,6 +37,10 @@ final class RateLimitServiceProvider extends ServiceProvider
         RateLimiter::for('writes', static fn (Request $request): Limit => Limit::perMinute(20)
             ->by('writes:'.self::actor($request)));
 
+        // Private tracking entries (a check-in may post mood + sleep + several symptoms).
+        RateLimiter::for('tracking', static fn (Request $request): Limit => Limit::perMinute(60)
+            ->by('tracking:'.self::actor($request)));
+
         // Search-as-you-type, but not enough to scrape usernames.
         RateLimiter::for('search', static fn (Request $request): Limit => Limit::perMinute(60)
             ->by('search:'.self::actor($request)));

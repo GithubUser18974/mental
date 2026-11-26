@@ -14,9 +14,640 @@
     { "name": "Profiles", "description": "Other members' public anonymous profiles, follows, blocks and username search" },
     { "name": "Community", "description": "Categories, interests, posts, images, the feed, comments, reactions, saved posts, hashtag search and trending" },
     { "name": "Safety", "description": "Reporting content to moderators" },
+    { "name": "Tracking", "description": "Private mood, symptom and sleep tracking, overview and insights (owner-only)" },
     { "name": "System", "description": "Operational endpoints" }
   ],
   "paths": {
+    "/tracking/moods": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "My check-in history",
+        "operationId": "listMoodEntrys",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Owner only. Newest first; optional local-day range.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "First local day (member's timezone)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Last local day (inclusive)"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MoodEntryPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Record a check-in",
+        "operationId": "createMoodEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoodEntryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/SingleMoodEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/tracking/moods/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "One of my check-ins",
+        "operationId": "getMoodEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "404 for other members' entries.",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleMoodEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Edit my check-in (partial)",
+        "operationId": "updateMoodEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MoodEntryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleMoodEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Delete my check-in permanently",
+        "operationId": "deleteMoodEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/tracking/symptoms": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "My symptom history",
+        "operationId": "listSymptomEntrys",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Owner only. Newest first; optional local-day range.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "First local day (member's timezone)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Last local day (inclusive)"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SymptomEntryPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Record a symptom",
+        "operationId": "createSymptomEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SymptomEntryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/SingleSymptomEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/tracking/symptoms/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "One of my symptoms",
+        "operationId": "getSymptomEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "404 for other members' entries.",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleSymptomEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Edit my symptom (partial)",
+        "operationId": "updateSymptomEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SymptomEntryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleSymptomEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Delete my symptom permanently",
+        "operationId": "deleteSymptomEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/tracking/sleep": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "My sleep record history",
+        "operationId": "listSleepEntrys",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Owner only. Newest first; optional local-day range.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "First local day (member's timezone)"
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Last local day (inclusive)"
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SleepEntryPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Record a sleep record",
+        "operationId": "createSleepEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SleepEntryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/SingleSleepEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/tracking/sleep/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "One of my sleep records",
+        "operationId": "getSleepEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "404 for other members' entries.",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleSleepEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Edit my sleep record (partial)",
+        "operationId": "updateSleepEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SleepEntryInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleSleepEntry"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Delete my sleep record permanently",
+        "operationId": "deleteSleepEntry",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/tracking/symptom-categories": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "Symptom categories",
+        "operationId": "listSymptomCategories",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Admin-configurable; localized.",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SymptomCategoryList"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          }
+        }
+      }
+    },
+    "/tracking/overview": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "My tracking dashboard",
+        "operationId": "getTrackingOverview",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Latest check-in, streak (local days), last 7 days, 7/30-day averages, top symptoms.",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TrackingOverview"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          }
+        }
+      }
+    },
+    "/tracking/insights": {
+      "get": {
+        "tags": [
+          "Tracking"
+        ],
+        "summary": "My personal insights",
+        "operationId": "getTrackingInsights",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Non-diagnostic observations computed in the background after changes; always shown with a disclaimer.",
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/TrackingInsights"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          }
+        }
+      }
+    },
     "/reports": {
       "post": {
         "tags": [
@@ -1564,6 +2195,431 @@
       }
     },
     "schemas": {
+      "MoodEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "mood",
+          "score",
+          "anxiety",
+          "stress",
+          "energy",
+          "notes",
+          "recorded_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "mood": {
+            "type": "string",
+            "enum": [
+              "very_sad",
+              "sad",
+              "neutral",
+              "good",
+              "very_good"
+            ]
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "anxiety": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "stress": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "energy": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "description": "Private; encrypted at rest"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MoodEntryInput": {
+        "type": "object",
+        "required": [
+          "mood"
+        ],
+        "description": "On PUT every field is optional (partial update).",
+        "properties": {
+          "mood": {
+            "type": "string",
+            "enum": [
+              "very_sad",
+              "sad",
+              "neutral",
+              "good",
+              "very_good"
+            ]
+          },
+          "score": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "anxiety": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "stress": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "energy": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "description": "Private; encrypted at rest"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Defaults to now; not in the future"
+          }
+        }
+      },
+      "SymptomCategory": {
+        "type": "object",
+        "required": [
+          "slug",
+          "name",
+          "icon"
+        ],
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string",
+            "description": "Localized"
+          },
+          "icon": {
+            "type": "string"
+          }
+        }
+      },
+      "SymptomEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "severity",
+          "duration_minutes",
+          "notes",
+          "recorded_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "category": {
+            "$ref": "#/components/schemas/SymptomCategory"
+          },
+          "severity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "duration_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "description": "Private; encrypted at rest"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SymptomEntryInput": {
+        "type": "object",
+        "required": [
+          "category",
+          "severity"
+        ],
+        "description": "On PUT every field is optional.",
+        "properties": {
+          "category": {
+            "type": "string",
+            "description": "Active category slug"
+          },
+          "severity": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 10
+          },
+          "duration_minutes": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10080
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000,
+            "description": "Private; encrypted at rest"
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Defaults to now; not in the future"
+          }
+        }
+      },
+      "SleepEntry": {
+        "type": "object",
+        "required": [
+          "id",
+          "duration_minutes",
+          "quality",
+          "recorded_at",
+          "updated_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "duration_minutes": {
+            "type": "integer"
+          },
+          "quality": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Wake-up time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SleepEntryInput": {
+        "type": "object",
+        "required": [
+          "duration_minutes"
+        ],
+        "properties": {
+          "duration_minutes": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 1440
+          },
+          "quality": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1,
+            "maximum": 10
+          },
+          "recorded_at": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Defaults to now; not in the future"
+          }
+        }
+      },
+      "TrackingOverview": {
+        "type": "object",
+        "properties": {
+          "latest": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MoodEntry"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "streak_days": {
+            "type": "integer"
+          },
+          "total_check_ins": {
+            "type": "integer"
+          },
+          "last_7_days": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "date": {
+                  "type": "string",
+                  "format": "date"
+                },
+                "mood": {
+                  "type": [
+                    "string",
+                    "null"
+                  ]
+                },
+                "score": {
+                  "type": [
+                    "number",
+                    "null"
+                  ]
+                }
+              }
+            }
+          },
+          "averages": {
+            "type": "object",
+            "description": "last_7_days / last_30_days → score, anxiety, stress, energy, sleep_hours, sleep_quality (null when no data)"
+          },
+          "top_symptoms": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "category": {
+                  "$ref": "#/components/schemas/SymptomCategory"
+                },
+                "count": {
+                  "type": "integer"
+                },
+                "average_severity": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      },
+      "TrackingInsights": {
+        "type": "object",
+        "required": [
+          "items",
+          "disclaimer",
+          "computed_at",
+          "refreshing"
+        ],
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "key": {
+                  "type": "string"
+                },
+                "kind": {
+                  "type": "string",
+                  "enum": [
+                    "observation",
+                    "milestone"
+                  ]
+                },
+                "text": {
+                  "type": "string",
+                  "description": "Localized, non-diagnostic"
+                }
+              }
+            }
+          },
+          "disclaimer": {
+            "type": "string"
+          },
+          "computed_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "refreshing": {
+            "type": "boolean",
+            "description": "True when insights are being computed for the first time"
+          }
+        }
+      },
       "ReportInput": {
         "type": "object",
         "required": [
@@ -2053,6 +3109,225 @@
       }
     },
     "responses": {
+      "SingleMoodEntry": {
+        "description": "check-in",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/MoodEntry"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "MoodEntryPage": {
+        "description": "Cursor-paginated check-ins, newest first",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MoodEntry"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SingleSymptomEntry": {
+        "description": "symptom",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SymptomEntry"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SymptomEntryPage": {
+        "description": "Cursor-paginated symptoms, newest first",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SymptomEntry"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SingleSleepEntry": {
+        "description": "sleep record",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/SleepEntry"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SleepEntryPage": {
+        "description": "Cursor-paginated sleep records, newest first",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SleepEntry"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SymptomCategoryList": {
+        "description": "Active symptom categories",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/SymptomCategory"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "TrackingOverview": {
+        "description": "Dashboard",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TrackingOverview"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "TrackingInsights": {
+        "description": "Insights",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/TrackingInsights"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
       "SingleReport": {
         "description": "Report",
         "content": {
