@@ -1,0 +1,28 @@
+# Weekly dependency update PRs (SRS §14.3 — dependency vulnerability checks).
+# Security advisories open PRs immediately regardless of schedule.
+version: 2
+updates:
+  - package-ecosystem: composer
+    directory: /backend
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      laravel:
+        patterns: ["laravel/*", "larastan/*", "pestphp/*"]
+
+  - package-ecosystem: pub
+    directory: /mobile
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+
+  - package-ecosystem: docker
+    directory: /backend/docker/php
+    schedule:
+      interval: monthly
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: monthly

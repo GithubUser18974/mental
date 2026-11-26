@@ -1,0 +1,16 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 8
+    paths:
+        - app
+        - config
+        - database
+        - routes
+    tmpDir: storage/framework/phpstan
+    checkModelProperties: true
+    # Module migrations too, so model/column checks know every table.
+    databaseMigrationsPath:
+        - database/migrations
+        - app/Modules/*/Database/Migrations

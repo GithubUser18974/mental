@@ -1,0 +1,23 @@
+include: package:very_good_analysis/analysis_options.yaml
+
+formatter:
+  page_width: 100
+
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "lib/app/localization/generated/**"
+  errors:
+    invalid_annotation_target: ignore
+
+linter:
+  rules:
+    # Project uses 100-char lines (see formatter.page_width).
+    lines_longer_than_80_chars: false
+    # Internal app code, not a published package.
+    public_member_api_docs: false

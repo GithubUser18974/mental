@@ -1,0 +1,1583 @@
+Anonymous Mental Health Community Platform
+Product specification · Version 1.0
+Document property	Value
+Document type	Software Requirements Specification
+Version	1.0
+Status	Initial baseline
+Mobile framework	Flutter
+Backend	PHP / Laravel
+API architecture	REST
+Database	PostgreSQL
+Target platforms	iOS and Android
+Primary audience	Adults 18+
+Product category	Mental wellness and peer support
+# 1. Introduction
+
+## 1.1 Purpose
+
+This document defines the functional and non-functional requirements for an anonymous mental health community and personal wellness tracking application.
+
+The platform will allow users to:
+- Share personal mental health experiences anonymously.
+- Connect and interact with people experiencing similar challenges.
+- Maintain private mental health profiles.
+- Track moods, symptoms, emotions, sleep and personal experiences.
+- Record medications, dosages, treatment schedules and medication experiences.
+- Maintain private journals.
+- Monitor personal progress over time.
+
+The system must prioritize privacy, anonymity between community members, security, user safety, accessibility and scalability.
+
+## 1.2 Product Vision
+
+Create a digital environment where people can express themselves without fear of judgment, connect with others who understand their experiences, and better understand their personal mental health journey.
+
+The platform is not intended to diagnose, treat or replace professional mental health services.
+
+## 1.3 Objectives
+
+1. Provide a safe anonymous social environment.
+2. Encourage healthy peer-to-peer support.
+3. Allow individuals to monitor their mental health over time.
+4. Provide private medication and treatment tracking.
+5. Encourage self-awareness through personal insights.
+6. Protect sensitive personal and health information.
+7. Build a scalable technical foundation for future features.
+
+## 1.4 Definitions
+
+| Term | Definition |
+|---|---|
+| Anonymous Profile | Public identity that does not expose real identity |
+| Mood Entry | Daily emotional status record |
+| Symptom Entry | Record of experienced symptoms |
+| Medication Log | Record of medication intake |
+| Journal Entry | Private personal writing |
+| Community Post | Content shared publicly or within the community |
+| Peer Support | Emotional support between community members |
+| Moderation | Review and management of inappropriate content |
+| Crisis Content | Content indicating potential immediate risk of harm |
+
+# 2. Scope
+
+## 2.1 In Scope
+
+The first product version shall include:
+
+1. User registration and authentication.
+2. Anonymous user profiles.
+3. Community feed.
+4. Posts and comments.
+5. Community reactions.
+6. Follow and connection functionality.
+7. Topic and category discovery.
+8. Content reporting and moderation.
+9. Personal mental health dashboard.
+10. Daily mood tracking.
+11. Symptom tracking.
+12. Medication management.
+13. Medication reminders.
+14. Private journal.
+15. Personal insights and progress.
+16. Push notifications.
+17. Privacy settings.
+18. Administrative dashboard.
+19. Account management and deletion.
+
+## 2.2 Out of Scope for Initial Release
+
+The following features may be introduced in future versions:
+
+- Online consultations with psychologists.
+- Video and audio calls.
+- Prescription issuance.
+- Pharmacy integrations.
+- AI diagnosis or treatment recommendations.
+- Medical record integrations.
+- Insurance integrations.
+- Professional therapist accounts.
+- Paid subscriptions and premium content.
+- Wearable device integrations.
+
+# 3. User Roles and Permissions
+
+The system shall support the following user roles.
+
+## 3.1 Guest User
+
+A guest user can:
+- View introductory information.
+- Explore public application information.
+- View onboarding screens.
+- Register or log in.
+
+A guest cannot interact with community content or access personal tracking features.
+
+## 3.2 Registered User
+
+A registered user can:
+- Create and manage an anonymous profile.
+- Publish posts.
+- Comment on posts.
+- React to content.
+- Follow other users.
+- Save posts.
+- Track moods and symptoms.
+- Manage medications.
+- Create private journal entries.
+- View personal insights.
+- Report inappropriate content.
+- Block other users.
+- Manage privacy settings.
+
+## 3.3 Moderator
+
+A moderator can:
+- Review reported content.
+- Hide or remove inappropriate content.
+- Restrict users from publishing.
+- Suspend accounts according to moderation policies.
+- Review moderation history.
+- Escalate critical safety incidents.
+
+Moderators must not have unrestricted access to private journals or personal medication records.
+
+## 3.4 Administrator
+
+An administrator can:
+- Manage application users.
+- Manage community categories and topics.
+- Manage moderation roles.
+- Configure application settings.
+- Manage notification templates.
+- Review system reports and analytics.
+- Manage crisis-support resources.
+- Manage moderation policies.
+
+Administrative access to sensitive information must be restricted, authorized and audited.
+
+# 4. Functional Requirements
+
+## 4.1 Authentication and Account Management
+
+### FR-AUTH-001: User Registration
+
+The system shall allow users to create accounts using supported authentication methods.
+
+Supported methods:
+- Email and password.
+- Phone number and OTP (optional).
+- Apple Sign-In.
+- Google Sign-In.
+
+The system shall generate a unique internal user identifier.
+
+### FR-AUTH-002: Anonymous Identity
+
+The system shall generate a pseudonymous profile for every registered user.
+
+Requirements:
+- Automatically generated username.
+- Generated avatar.
+- Optional custom username.
+- Optional biography.
+- Optional profile interests.
+- Ability to change username subject to availability and abuse-prevention rules.
+
+The public identity must not expose the user's real name, email address, phone number or authentication credentials.
+
+**Important:** Anonymous means anonymous to other community members. The platform may still process account identifiers and security logs. The privacy policy must explain this distinction.
+
+### FR-AUTH-003: Account Security
+
+The system shall:
+- Support secure authentication.
+- Hash passwords using a secure password hashing algorithm.
+- Support password recovery.
+- Support session expiration.
+- Support logout from all devices.
+- Rate-limit authentication attempts.
+- Protect against brute-force attacks.
+
+### FR-AUTH-004: Account Deletion
+
+Users shall be able to request account deletion.
+
+The system shall:
+- Explain the consequences before deletion.
+- Remove or anonymize public profile information.
+- Remove or anonymize community contributions according to the deletion policy.
+- Delete personal health records and journals according to applicable retention requirements.
+- Revoke active authentication sessions.
+- Record the deletion request status.
+
+The system must disclose any legally required retention exceptions.
+
+## 4.2 Onboarding
+
+### FR-ONB-001: Welcome Screens
+
+The application shall provide onboarding screens explaining:
+- Application purpose.
+- Anonymous community concept.
+- Personal tracking capabilities.
+- Privacy and data protection.
+- Community guidelines.
+
+### FR-ONB-002: Profile Setup
+
+Users shall be able to configure:
+- Anonymous username.
+- Avatar.
+- Optional biography.
+- Topics of interest.
+
+### FR-ONB-003: Privacy Preferences
+
+Users shall be able to configure:
+- Public profile visibility.
+- Follow permissions.
+- Notification preferences.
+- Personal data-sharing preferences.
+
+Health information shall remain private by default.
+
+## 4.3 Community Module
+
+### FR-COM-001: Community Feed
+
+The application shall provide a feed containing community publications.
+
+The feed shall support:
+- Recent posts.
+- Popular posts.
+- Posts from followed users.
+- Topic-based filtering.
+- Search and discovery.
+
+Feed ranking must avoid systematically promoting harmful, sensational or crisis-related content.
+
+### FR-COM-002: Create Post
+
+Users shall be able to publish anonymous posts.
+
+Supported content:
+- Text.
+- Images (optional).
+- Hashtags.
+- Topics and categories.
+- Content warnings.
+- Optional comments.
+
+Each post shall contain:
+- Post ID.
+- Author profile ID.
+- Content.
+- Category.
+- Created date.
+- Updated date.
+- Moderation status.
+- Visibility status.
+
+### FR-COM-003: Post Categories
+
+The platform shall provide the following initial categories:
+
+| Category | Description |
+|---|---|
+| My Story | Personal mental health experiences |
+| Need Support | Seeking emotional support |
+| Daily Thoughts | Sharing daily feelings |
+| Medication Experience | Personal medication experiences |
+| Recovery Journey | Sharing personal progress |
+| Questions | Asking community questions |
+| Mental Wellness | General wellness discussions |
+
+Administrators shall be able to add, edit and deactivate categories.
+
+### FR-COM-004: Comments
+
+Users shall be able to:
+- Comment on posts.
+- Reply to comments.
+- Edit their own comments.
+- Delete their own comments.
+- Report comments.
+
+Comment visibility shall follow post visibility and moderation rules.
+
+### FR-COM-005: Reactions
+
+The application shall provide supportive reactions rather than relying only on conventional likes.
+
+Initial reactions:
+- I understand you.
+- Sending support.
+- You're not alone.
+- Proud of you.
+- Thank you for sharing.
+
+Users can add or remove reactions.
+
+A user shall have a maximum of one active reaction type per post, unless product policy changes.
+
+### FR-COM-006: Follow Users
+
+Users shall be able to:
+- Follow anonymous profiles.
+- Unfollow profiles.
+- View followed profiles.
+- Receive notifications for selected followed-user activities.
+
+### FR-COM-007: Save Posts
+
+Users shall be able to bookmark posts privately.
+
+Saved posts must never appear publicly on their profile.
+
+### FR-COM-008: Search and Discovery
+
+The application shall support searching by:
+- Topics.
+- Hashtags.
+- Categories.
+- Anonymous usernames.
+- Post content.
+
+Search results must respect moderation, blocking and visibility rules.
+
+### FR-COM-009: Blocking
+
+Users shall be able to block other users.
+
+Blocking shall:
+- Prevent the blocked user from interacting with the blocker.
+- Hide relevant content between the two users.
+- Prevent follow relationships.
+- Restrict direct communication if introduced in the future.
+
+### FR-COM-010: Reporting
+
+Users shall be able to report:
+- Posts.
+- Comments.
+- Profiles.
+- Harassment.
+- Dangerous medical advice.
+- Spam.
+- Self-harm encouragement.
+- Suicidal content.
+- Other policy violations.
+
+Reports shall be sent to the moderation system.
+
+## 4.4 Anonymous User Profile
+
+### FR-PRO-001: Profile Information
+
+Each user shall have a public anonymous profile containing:
+
+- Anonymous username.
+- Avatar.
+- Biography.
+- Joined date.
+- Public posts.
+- Public community activity.
+- Interests and topics.
+- Optional achievements.
+
+### FR-PRO-002: Private Profile Information
+
+The following information shall remain private:
+
+- Real identity.
+- Email and phone number.
+- Medication records.
+- Mood history.
+- Symptom history.
+- Journal entries.
+- Private notes.
+- Health insights.
+
+### FR-PRO-003: Profile Statistics
+
+The system may display:
+- Number of public posts.
+- Number of community contributions.
+- Number of followers.
+- Number of following profiles.
+- Earned community achievements.
+
+No health-related metrics shall be exposed publicly by default.
+
+## 4.5 Mental Health Tracking
+
+### FR-TRACK-001: Daily Check-in
+
+Users shall be able to submit daily mental health check-ins.
+
+Each check-in shall support:
+
+| Field | Description |
+|---|---|
+| Mood | Overall emotional state |
+| Mood score | Scale from 1 to 10 |
+| Anxiety | Scale from 1 to 10 |
+| Stress | Scale from 1 to 10 |
+| Energy | Scale from 1 to 10 |
+| Sleep quality | Scale from 1 to 10 |
+| Sleep duration | Hours |
+| Notes | Optional private description |
+| Date | Check-in date |
+
+Users may skip any optional field.
+
+### FR-TRACK-002: Mood Selection
+
+The application shall provide mood options such as:
+
+- Very sad.
+- Sad.
+- Neutral.
+- Good.
+- Very good.
+
+Users shall be able to select an emotional state and optionally provide additional details.
+
+### FR-TRACK-003: Symptom Tracking
+
+Users shall be able to record symptoms using configurable symptom categories.
+
+Examples:
+- Anxiety.
+- Low energy.
+- Difficulty concentrating.
+- Irritability.
+- Sleep disturbances.
+- Loss of motivation.
+- Restlessness.
+- Sadness.
+
+Each symptom entry may contain:
+- Symptom type.
+- Severity (1–10).
+- Date and time.
+- Duration.
+- Optional private notes.
+
+The symptom list shall be configurable by the application administrator.
+
+### FR-TRACK-004: Mood History
+
+The system shall display historical mood records using:
+
+- Daily view.
+- Weekly view.
+- Monthly view.
+- Calendar view.
+- Graphical trends.
+
+### FR-TRACK-005: Personal Insights
+
+The system shall generate non-diagnostic observations based on user-recorded data.
+
+Examples:
+- Mood trends during the last 30 days.
+- Frequently recorded emotions.
+- Sleep and mood patterns.
+- Stress trends.
+- Personal improvement milestones.
+
+Insights must not claim medical causation or provide a diagnosis.
+
+### FR-TRACK-006: Edit and Delete Entries
+
+Users shall be able to edit and delete their personal tracking entries.
+
+All personal tracking records must remain private unless the user explicitly shares selected information.
+
+## 4.6 Medication Management
+
+### FR-MED-001: Add Medication
+
+Users shall be able to add medication records.
+
+Medication fields:
+
+| Field | Required |
+|---|---|
+| Medication name | Yes |
+| Dosage | Yes |
+| Dosage unit | Yes |
+| Frequency | Yes |
+| Start date | Yes |
+| End date | No |
+| Instructions | No |
+| Prescribing clinician | No |
+| Reminder preference | No |
+| Personal notes | No |
+
+Medication entries are user-maintained records, not prescriptions.
+
+### FR-MED-002: Medication Schedule
+
+The application shall support medication schedules.
+
+Supported scheduling options:
+- Once daily.
+- Multiple times per day.
+- Specific days of the week.
+- Custom schedules.
+- Temporary schedules.
+
+### FR-MED-003: Medication Reminders
+
+Users shall be able to configure reminders.
+
+The system shall:
+- Schedule local notifications.
+- Allow reminders to be enabled or disabled.
+- Support timezone changes.
+- Avoid notifying users after medication records have been discontinued.
+- Avoid exposing medication names in notification previews by default.
+
+### FR-MED-004: Medication Intake Logging
+
+Users shall be able to record medication intake.
+
+Supported statuses:
+- Taken.
+- Skipped.
+- Missed.
+- Delayed.
+
+Each log shall include:
+- Medication ID.
+- Scheduled time.
+- Actual intake time (if taken).
+- Status.
+- Optional notes.
+
+### FR-MED-005: Medication Experience
+
+Users shall be able to privately record:
+- Perceived benefits.
+- Side effects.
+- Physical or emotional changes.
+- General experience.
+- Date of observation.
+
+### FR-MED-006: Medication History
+
+The application shall display:
+- Current medications.
+- Past medications.
+- Medication schedules.
+- Intake history.
+- Recorded experiences.
+
+The application must not recommend changing dosage, stopping medication or starting treatment based on community posts or automated insights.
+
+### FR-MED-007: Sharing Medication Experiences
+
+Users may voluntarily create community posts based on their medication experiences.
+
+The application must require an explicit publishing action and must not automatically expose private medication records.
+
+## 4.7 Private Journal
+
+### FR-JOURNAL-001: Create Journal Entry
+
+Users shall be able to create private journal entries.
+
+Each entry may include:
+- Title.
+- Content.
+- Mood.
+- Related tags.
+- Date.
+- Optional attachments.
+
+### FR-JOURNAL-002: Journal Management
+
+Users shall be able to:
+- Create entries.
+- Edit entries.
+- Delete entries.
+- Search entries.
+- Filter by date.
+- Filter by mood.
+- View journal history.
+
+### FR-JOURNAL-003: Journal Privacy
+
+Journal entries shall be private by default.
+
+They shall not be indexed by community search or included in public profiles.
+
+### FR-JOURNAL-004: Share Journal Entry
+
+Users may explicitly convert a journal entry into a community post.
+
+Before publishing, the application shall:
+- Show the complete content.
+- Allow editing.
+- Explain that the content will become visible to the selected audience.
+- Require confirmation.
+
+## 4.8 Personal Progress Dashboard
+
+### FR-PROGRESS-001: Dashboard
+
+The application shall provide a personal dashboard containing:
+
+- Current mood.
+- Recent mood history.
+- Weekly and monthly trends.
+- Symptom history.
+- Sleep history.
+- Medication adherence records.
+- Recent journal entries.
+- Personal milestones.
+
+### FR-PROGRESS-002: Milestones
+
+The application may recognize milestones such as:
+- First check-in.
+- Seven consecutive days of tracking.
+- First month of journaling.
+- Personal goals achieved.
+
+Milestones shall not imply that users have recovered or that their condition has improved medically.
+
+### FR-PROGRESS-003: Data Visualization
+
+The system shall provide clear charts and summaries.
+
+Users shall be able to filter historical data by date range.
+
+## 4.9 Notifications
+
+### FR-NOTIF-001: Notification Types
+
+The system shall support:
+
+| Notification | Example |
+|---|---|
+| Community reaction | Someone understood your story |
+| Comment | Someone commented on your post |
+| Follow | Someone followed your profile |
+| Medication reminder | A scheduled reminder |
+| Daily check-in | Time for your daily check-in |
+| Personal milestone | You completed seven check-ins |
+| Moderation | Update on a reported post |
+
+### FR-NOTIF-002: Notification Preferences
+
+Users shall be able to:
+- Enable or disable notification categories.
+- Configure reminder times.
+- Configure quiet hours.
+- Disable sensitive notification previews.
+
+Notifications must not expose sensitive information on a locked device.
+
+## 4.10 Crisis Support and Community Safety
+
+### FR-SAFETY-001: Content Safety
+
+The system shall detect and route potentially dangerous content for appropriate safety handling.
+
+Potential content categories:
+- Suicidal ideation.
+- Self-harm.
+- Encouragement of self-harm.
+- Medication misuse.
+- Threats or harassment.
+- Dangerous medical instructions.
+
+Automated detection must not be the sole basis for deciding that a user is safe or for making irreversible account decisions.
+
+### FR-SAFETY-002: Crisis Support
+
+When content indicates possible immediate danger, the application shall display a supportive intervention.
+
+The intervention should:
+- Acknowledge the user's distress.
+- Encourage contacting emergency services or a trusted person when immediate danger exists.
+- Display verified local crisis and emergency resources.
+- Offer an appropriate reporting or escalation pathway.
+- Avoid judgmental language.
+
+Crisis resources must be verified and configurable by administrators for supported countries.
+
+### FR-SAFETY-003: Moderation
+
+Moderators shall be able to review flagged content.
+
+The system shall maintain:
+- Report status.
+- Moderation decision.
+- Moderator ID.
+- Action date.
+- Reason for action.
+- Audit history.
+
+### FR-SAFETY-004: Community Guidelines
+
+The application shall prohibit:
+- Harassment.
+- Bullying.
+- Discrimination.
+- Sharing another user's identity without consent.
+- Dangerous medical instructions.
+- Encouraging self-harm.
+- Promoting suicide.
+- Selling prescription medication.
+- Exploitation of vulnerable members.
+
+# 5. Administrative Dashboard
+
+The platform shall provide a web-based administration panel.
+
+## 5.1 User Management
+
+Administrators shall be able to:
+- Search user accounts by internal identifiers and anonymous usernames.
+- View account status.
+- Suspend accounts.
+- Reactivate accounts.
+- Review account-related reports.
+
+## 5.2 Content Management
+
+Administrators shall be able to:
+- Manage community categories.
+- Manage hashtags and topics.
+- Review flagged posts.
+- Remove prohibited content.
+- Manage content visibility.
+
+## 5.3 Moderation Management
+
+The dashboard shall support:
+- Report queues.
+- Report prioritization.
+- Moderator assignment.
+- Moderation decisions.
+- Escalation workflows.
+- Audit history.
+
+## 5.4 Application Configuration
+
+Administrators shall be able to manage:
+- Notification templates.
+- Community guidelines.
+- Crisis-support resources.
+- Symptom categories.
+- Application settings.
+- Feature availability.
+
+## 5.5 Analytics
+
+The dashboard shall provide aggregated statistics:
+
+- Total registered users.
+- Daily active users.
+- Monthly active users.
+- Total community posts.
+- Engagement rates.
+- Tracking adoption.
+- Medication tracking adoption.
+- Moderation statistics.
+
+Health analytics must be aggregated and privacy-preserving. Access to identifiable health information for analytics is prohibited by default.
+
+# 6. System Architecture
+
+## 6.1 Technology Stack
+
+### Mobile Application
+
+| Technology | Purpose |
+|---|---|
+| Flutter | Cross-platform mobile development |
+| Dart | Programming language |
+| Riverpod | State management |
+| GoRouter | Navigation |
+| Dio | HTTP client |
+| Freezed | Immutable models |
+| JsonSerializable | JSON serialization |
+| Flutter Secure Storage | Secure local credential storage |
+| Hive / SQLite | Local storage and caching |
+| Firebase Cloud Messaging | Push notifications |
+| Flutter Local Notifications | Medication and check-in reminders |
+
+### Backend
+
+| Technology | Purpose |
+|---|---|
+| PHP 8.3+ | Backend language |
+| Laravel | Backend framework |
+| Laravel Sanctum | API authentication |
+| PostgreSQL | Primary database |
+| Redis | Caching and queues |
+| Laravel Queues | Background processing |
+| Laravel Scheduler | Scheduled tasks |
+| Laravel Notifications | Notification management |
+| REST API | Mobile-backend communication |
+| OpenAPI | API documentation |
+
+### Administration
+
+- Laravel-based administration interface.
+- Role-based access control.
+- Responsive web interface.
+- Audit logging.
+
+## 6.2 Architecture Pattern
+
+The backend shall follow a modular monolith architecture.
+
+Recommended modules:
+
+1. Authentication.
+2. Identity and Profiles.
+3. Community.
+4. Content Moderation.
+5. Mental Health Tracking.
+6. Medication Management.
+7. Journaling.
+8. Notifications.
+9. Reporting and Analytics.
+10. Administration.
+
+Each module should have clearly defined responsibilities and boundaries.
+
+The mobile application shall follow Clean Architecture with feature-based organization.
+
+Recommended Flutter layers:
+
+- Presentation.
+- Application / Providers.
+- Domain.
+- Data.
+
+Business logic must not be implemented directly inside UI widgets.
+
+## 6.3 Backend Architecture Principles
+
+- RESTful API conventions.
+- Service-oriented business logic.
+- Repository abstraction where useful.
+- Form Request validation.
+- Resource-based API responses.
+- Dependency injection.
+- Centralized exception handling.
+- Database transactions for critical operations.
+- Queue-based background jobs.
+- Structured logging.
+- Role-based authorization policies.
+
+Microservices are not required for the initial release.
+
+# 7. Database Requirements
+
+The primary database shall be PostgreSQL.
+
+The following tables represent the initial logical data model.
+
+## 7.1 Identity and Authentication
+
+| Table | Main fields |
+|---|---|
+| users | id, email, phone, password_hash, status |
+| anonymous_profiles | id, user_id, username, avatar, bio |
+| user_preferences | id, user_id, language, timezone |
+| user_privacy_settings | id, user_id, visibility, preferences |
+| user_follows | id, follower_id, following_id |
+| user_blocks | id, blocker_id, blocked_id |
+| user_devices | id, user_id, device_token, platform |
+
+## 7.2 Community
+
+| Table | Main fields |
+|---|---|
+| posts | id, user_id, category_id, content, status |
+| post_categories | id, name, description |
+| post_media | id, post_id, media_url |
+| comments | id, post_id, user_id, parent_id, content |
+| reactions | id, post_id, user_id, reaction_type |
+| saved_posts | id, user_id, post_id |
+| hashtags | id, name |
+| post_hashtags | post_id, hashtag_id |
+| reports | id, reporter_id, target_type, target_id, reason |
+
+## 7.3 Mental Health Tracking
+
+| Table | Main fields |
+|---|---|
+| mood_entries | id, user_id, mood, score, recorded_at |
+| symptom_categories | id, name |
+| symptom_entries | id, user_id, category_id, severity, recorded_at |
+| sleep_entries | id, user_id, duration, quality, recorded_at |
+| personal_milestones | id, user_id, title, achieved_at |
+
+## 7.4 Medication
+
+| Table | Main fields |
+|---|---|
+| medications | id, user_id, name, dosage, unit, status |
+| medication_schedules | id, medication_id, frequency, schedule_data |
+| medication_logs | id, medication_id, scheduled_at, taken_at, status |
+| medication_experiences | id, medication_id, description, recorded_at |
+
+## 7.5 Journaling
+
+| Table | Main fields |
+|---|---|
+| journal_entries | id, user_id, title, content, mood, created_at |
+| journal_tags | id, name |
+| journal_entry_tags | journal_entry_id, tag_id |
+| journal_attachments | id, journal_entry_id, file_url |
+
+## 7.6 Notifications and Moderation
+
+| Table | Main fields |
+|---|---|
+| notifications | id, user_id, type, payload, read_at |
+| notification_preferences | id, user_id, notification_type, enabled |
+| moderation_actions | id, moderator_id, target_type, target_id, action |
+| moderation_logs | id, action_id, details |
+| crisis_resources | id, country_code, resource_type, contact_details |
+| audit_logs | id, actor_id, action, target, created_at |
+
+## 7.7 Database Design Rules
+
+- All entities shall have primary keys.
+- Foreign keys shall enforce relational integrity.
+- Sensitive information shall have restricted access.
+- Timestamps shall be stored consistently in UTC.
+- User-facing dates shall be converted using the user's timezone.
+- Appropriate database indexes shall be created.
+- Soft deletion shall be used only where justified by retention and privacy requirements.
+- Medication schedules shall support timezone and daylight-saving changes.
+- Private health records shall never be joined into public community responses.
+
+# 8. API Requirements
+
+## 8.1 API Standards
+
+The backend shall expose RESTful endpoints.
+
+Base URL example:
+
+`/api/v1`
+
+All authenticated endpoints shall require valid authentication.
+
+API requirements:
+- JSON request and response bodies.
+- Consistent HTTP status codes.
+- Request validation.
+- Pagination.
+- Filtering and sorting.
+- Rate limiting.
+- Standardized error responses.
+- API versioning.
+
+## 8.2 Authentication Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| POST | /auth/register | Register account |
+| POST | /auth/login | Login |
+| POST | /auth/logout | Logout |
+| POST | /auth/refresh | Refresh session if supported |
+| POST | /auth/forgot-password | Password recovery |
+| POST | /auth/reset-password | Reset password |
+| GET | /auth/me | Current account |
+
+## 8.3 Profile Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /profile | Get own profile |
+| PUT | /profile | Update profile |
+| GET | /profiles/{username} | View public profile |
+| POST | /profiles/{id}/follow | Follow user |
+| DELETE | /profiles/{id}/follow | Unfollow user |
+| POST | /profiles/{id}/block | Block user |
+| DELETE | /profiles/{id}/block | Unblock user |
+
+## 8.4 Community Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /posts | Get feed |
+| POST | /posts | Create post |
+| GET | /posts/{id} | Get post |
+| PUT | /posts/{id} | Update post |
+| DELETE | /posts/{id} | Delete post |
+| POST | /posts/{id}/comments | Add comment |
+| GET | /posts/{id}/comments | Get comments |
+| POST | /posts/{id}/reactions | Add reaction |
+| DELETE | /posts/{id}/reactions | Remove reaction |
+| POST | /posts/{id}/save | Save post |
+| DELETE | /posts/{id}/save | Unsave post |
+| POST | /reports | Report content |
+
+## 8.5 Tracking Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /tracking/overview | Get tracking dashboard |
+| POST | /tracking/moods | Create mood entry |
+| GET | /tracking/moods | Get mood history |
+| PUT | /tracking/moods/{id} | Update mood |
+| DELETE | /tracking/moods/{id} | Delete mood |
+| POST | /tracking/symptoms | Create symptom entry |
+| GET | /tracking/symptoms | Get symptom history |
+| POST | /tracking/sleep | Create sleep record |
+| GET | /tracking/insights | Get personal insights |
+
+## 8.6 Medication Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /medications | List medications |
+| POST | /medications | Add medication |
+| GET | /medications/{id} | Medication details |
+| PUT | /medications/{id} | Update medication |
+| DELETE | /medications/{id} | Delete medication |
+| POST | /medications/{id}/logs | Record intake |
+| GET | /medications/{id}/logs | Medication history |
+| POST | /medications/{id}/experiences | Add experience |
+
+## 8.7 Journal Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /journal | Get journal entries |
+| POST | /journal | Create entry |
+| GET | /journal/{id} | Get entry |
+| PUT | /journal/{id} | Update entry |
+| DELETE | /journal/{id} | Delete entry |
+| POST | /journal/{id}/publish | Create community post from entry |
+
+## 8.8 Notifications Endpoints
+
+| Method | Endpoint | Description |
+|---|---|---|
+| GET | /notifications | Get notifications |
+| PATCH | /notifications/{id}/read | Mark as read |
+| POST | /notifications/read-all | Mark all as read |
+| GET | /notification-preferences | Get preferences |
+| PUT | /notification-preferences | Update preferences |
+| POST | /devices | Register device |
+| DELETE | /devices/{id} | Remove device |
+
+## 8.9 Standard API Response
+
+Successful response:
+
+```json
+{
+  "success": true,
+  "message": "Mood entry created successfully",
+  "data": {
+    "id": "uuid",
+    "mood": "good",
+    "score": 7,
+    "recorded_at": "2026-11-12T10:00:00Z"
+  }
+}
+```
+
+Error response:
+
+```json
+{
+  "success": false,
+  "message": "Validation failed",
+  "errors": {
+    "score": [
+      "The score must be between 1 and 10."
+    ]
+  }
+}
+```
+
+All private endpoints must verify ownership and authorization, not merely the existence of the requested record.
+
+# 9. Non-Functional Requirements
+
+## 9.1 Performance
+
+- Standard API responses should target less than 500 ms at the 95th percentile under the defined normal operating load.
+- Feed pagination shall avoid loading the entire dataset.
+- Images shall be optimized and compressed.
+- Database queries shall use appropriate indexing.
+- Background jobs shall handle non-critical processing.
+- Large analytics calculations shall not block user requests.
+
+## 9.2 Scalability
+
+The system shall support:
+- Horizontal backend scaling.
+- Database connection pooling.
+- Redis caching.
+- Queue workers.
+- Object storage.
+- CDN-based media delivery.
+- Future extraction of independent modules into services.
+
+## 9.3 Security
+
+The system shall implement:
+
+- HTTPS for all network communication.
+- Secure password hashing using Argon2id or an appropriately configured bcrypt implementation.
+- Secure token storage on mobile devices.
+- Role-based access control.
+- Resource-level ownership authorization.
+- Rate limiting.
+- Input validation and sanitization.
+- SQL injection protection.
+- Protection against XSS and CSRF where applicable.
+- Secure file upload validation.
+- Encryption of sensitive data at rest.
+- Encryption of backups.
+- Secret management outside source code.
+- Security audit logs.
+- Restricted administrative access.
+
+Sensitive health information should be encrypted using a managed encryption key system, with key rotation and access auditing.
+
+The system should undergo security testing before public release.
+
+## 9.4 Privacy
+
+Privacy is a critical system requirement.
+
+The system shall:
+- Keep health data private by default.
+- Separate authentication identity from anonymous community identity.
+- Prevent accidental exposure of personal records.
+- Avoid putting health data into analytics or crash-reporting payloads.
+- Provide data export and deletion mechanisms.
+- Minimize collected personal information.
+- Explain data collection and retention.
+- Obtain explicit consent for optional sensitive processing.
+
+The product must undergo a privacy and legal review against applicable requirements, including Egypt's Personal Data Protection Law and relevant requirements in any other launch market.
+
+## 9.5 Availability
+
+Initial production availability target: 99.5% monthly, excluding scheduled maintenance.
+
+The infrastructure shall support:
+- Automated backups.
+- Database recovery procedures.
+- Monitoring.
+- Error tracking.
+- Service health checks.
+- Incident response procedures.
+
+## 9.6 Usability
+
+- Support Arabic and English.
+- Support RTL and LTR layouts.
+- Provide accessible typography.
+- Support light and dark modes.
+- Follow accessibility guidelines.
+- Use empathetic and non-judgmental language.
+- Avoid clinical or stigmatizing interface language.
+
+## 9.7 Compatibility
+
+The mobile application shall support:
+- iOS.
+- Android.
+- Multiple screen sizes.
+- Different screen densities.
+- Modern OS versions defined in the release compatibility policy.
+
+# 10. Flutter Application Requirements
+
+## 10.1 Flutter Architecture
+
+The mobile application shall follow feature-first Clean Architecture.
+
+Suggested folder structure:
+
+```text
+lib/
+├── app/
+│   ├── app.dart
+│   ├── router/
+│   ├── theme/
+│   └── localization/
+│
+├── core/
+│   ├── network/
+│   ├── storage/
+│   ├── security/
+│   ├── errors/
+│   ├── widgets/
+│   └── utils/
+│
+├── features/
+│   ├── authentication/
+│   ├── onboarding/
+│   ├── community/
+│   ├── profile/
+│   ├── tracking/
+│   ├── medication/
+│   ├── journal/
+│   ├── progress/
+│   ├── notifications/
+│   └── settings/
+│
+└── main.dart
+```
+
+Each feature should contain:
+
+```text
+feature/
+├── data/
+│   ├── datasources/
+│   ├── models/
+│   └── repositories/
+│
+├── domain/
+│   ├── entities/
+│   ├── repositories/
+│   └── usecases/
+│
+└── presentation/
+    ├── pages/
+    ├── widgets/
+    └── providers/
+```
+
+## 10.2 State Management
+
+Riverpod shall manage application state.
+
+Requirements:
+- Use providers for dependency injection.
+- Use AsyncNotifier or Notifier where appropriate.
+- Separate UI state from business logic.
+- Avoid unnecessary global mutable state.
+- Handle loading, success, empty and error states.
+- Support pagination for feeds and lists.
+
+## 10.3 Navigation
+
+GoRouter shall manage application navigation.
+
+The navigation system shall support:
+- Authentication guards.
+- Protected routes.
+- Deep links.
+- Nested navigation.
+- Route-level state handling.
+
+## 10.4 Local Storage
+
+Local storage shall be used for:
+- Authentication credentials and tokens using secure storage.
+- Non-sensitive user preferences.
+- Temporary feed caching.
+- Pending non-sensitive operations.
+
+Private journal and medication information must not be stored unencrypted in local databases.
+
+## 10.5 Error Handling
+
+The application shall provide:
+- Centralized API error handling.
+- Network error handling.
+- Authentication expiration handling.
+- Validation messages.
+- Retry support for safe operations.
+- Offline and connectivity indicators.
+
+# 11. User Experience and Screens
+
+The initial mobile application shall contain the following screens.
+
+## 11.1 Authentication and Onboarding
+
+1. Splash Screen.
+2. Welcome Screen.
+3. Onboarding Introduction.
+4. Registration.
+5. Login.
+6. Password Recovery.
+7. Anonymous Profile Setup.
+8. Privacy Preferences.
+
+## 11.2 Community
+
+1. Community Home.
+2. Main Feed.
+3. Post Details.
+4. Create Post.
+5. Edit Post.
+6. Comments.
+7. Topic Discovery.
+8. Search.
+9. Saved Posts.
+10. Followers and Following.
+11. User Public Profile.
+12. Report Content.
+
+## 11.3 Personal Health
+
+1. Daily Check-in.
+2. Mood Selection.
+3. Mood History.
+4. Symptom Tracking.
+5. Sleep Tracking.
+6. Personal Insights.
+7. Progress Dashboard.
+
+## 11.4 Medication
+
+1. Medication List.
+2. Add Medication.
+3. Medication Details.
+4. Medication Schedule.
+5. Intake History.
+6. Medication Experience.
+7. Reminder Settings.
+
+## 11.5 Journal
+
+1. Journal Home.
+2. Create Journal Entry.
+3. Edit Journal Entry.
+4. Journal Details.
+5. Journal Search.
+6. Journal Filters.
+
+## 11.6 Profile and Settings
+
+1. My Profile.
+2. Edit Profile.
+3. Privacy Settings.
+4. Notification Settings.
+5. Blocked Users.
+6. Account Security.
+7. Data Export.
+8. Delete Account.
+9. About and Legal.
+
+# 12. Business Rules
+
+The following rules shall apply throughout the application.
+
+| ID | Business rule |
+|---|---|
+| BR-001 | Users must be at least 18 years old at launch. |
+| BR-002 | Every account must have a unique internal ID. |
+| BR-003 | Every registered user must have a unique anonymous username. |
+| BR-004 | Public profiles must not expose real identity. |
+| BR-005 | Health tracking records must be private by default. |
+| BR-006 | Journal entries must be private by default. |
+| BR-007 | Only record owners can modify their private health data. |
+| BR-008 | Blocked users cannot interact with each other. |
+| BR-009 | Reported content must be reviewable by authorized moderators. |
+| BR-010 | Medication information must not be treated as a prescription. |
+| BR-011 | Community content must not be presented as professional medical advice. |
+| BR-012 | Users must explicitly approve publishing private content. |
+| BR-013 | Users can disable optional notifications. |
+| BR-014 | Deleted or hidden content must respect applicable retention rules. |
+| BR-015 | Automated insights must not provide medical diagnoses. |
+
+# 13. Testing Requirements
+
+## 13.1 Flutter Testing
+
+The mobile application shall include:
+
+- Unit tests.
+- Widget tests.
+- Integration tests.
+- Navigation tests.
+- State management tests.
+- API integration tests.
+- Local storage tests.
+- Notification tests.
+
+## 13.2 Backend Testing
+
+The Laravel backend shall include:
+
+- Unit tests.
+- Feature tests.
+- API tests.
+- Database tests.
+- Authorization tests.
+- Validation tests.
+- Queue tests.
+- Authentication tests.
+- Security tests.
+
+## 13.3 Critical Test Scenarios
+
+1. A user cannot access another user's medication records.
+2. A user cannot access another user's journal entries.
+3. A user cannot access another user's mood history.
+4. An anonymous profile never exposes account credentials.
+5. A blocked user cannot interact with the blocking user.
+6. Deleted posts cannot be accessed through normal public API endpoints.
+7. Medication reminders stop when the medication is discontinued.
+8. Users cannot publish content on behalf of other users.
+9. Invalid medication records are rejected.
+10. Invalid mood scores are rejected.
+11. Unauthorized users cannot access moderation endpoints.
+12. Sensitive information is not exposed through push notifications.
+13. Crisis-related content is routed through the configured safety workflow.
+14. Account deletion follows the documented data deletion and retention policy.
+
+# 14. Deployment and DevOps
+
+## 14.1 Environments
+
+The project shall support:
+
+- Development.
+- Staging.
+- Production.
+
+Each environment shall have independent configuration and credentials.
+
+## 14.2 Backend Deployment
+
+The Laravel application shall support deployment using:
+
+- Linux-based hosting.
+- Nginx.
+- PHP-FPM.
+- PostgreSQL.
+- Redis.
+- Queue workers.
+- Laravel Scheduler.
+- Object storage.
+
+Docker may be used for consistent development and deployment environments.
+
+## 14.3 CI/CD
+
+The CI/CD pipeline shall perform:
+
+1. Code formatting and static analysis.
+2. Flutter analysis.
+3. Flutter unit and widget tests.
+4. PHP static analysis.
+5. Laravel automated tests.
+6. Dependency vulnerability checks.
+7. Build generation.
+8. Staging deployment.
+9. Production deployment after approval.
+
+## 14.4 Monitoring
+
+The production system shall monitor:
+- API response times.
+- Server resource consumption.
+- Database performance.
+- Queue failures.
+- Authentication failures.
+- Application crashes.
+- Push notification failures.
+- Security events.
+
+Sensitive user content must not be included in logs.
+
+# 15. Acceptance Criteria
+
+The first release shall be considered ready when:
+
+1. Users can register and authenticate.
+2. Anonymous profiles are created successfully.
+3. Users can create and browse community posts.
+4. Users can comment and react.
+5. Users can follow and block profiles.
+6. Users can report inappropriate content.
+7. Moderators can review and manage reports.
+8. Users can record daily moods.
+9. Users can track symptoms and sleep.
+10. Users can add and manage medication records.
+11. Medication reminders work correctly.
+12. Users can record medication intake.
+13. Users can create private journal entries.
+14. Users can view historical tracking information.
+15. Users can access their personal dashboard.
+16. Users can configure privacy and notifications.
+17. Arabic and English interfaces work correctly.
+18. Critical authorization and privacy tests pass.
+19. Account deletion and data export workflows are implemented.
+20. The application passes security and release-readiness testing.
+
+# 16. Future Enhancements
+
+Potential future releases:
+
+- AI-assisted journaling.
+- Personalized non-diagnostic insights.
+- Optional professional mental health accounts.
+- Therapist discovery.
+- Community groups.
+- Private support circles.
+- Anonymous audio stories.
+- Wearable integrations.
+- Advanced data visualization.
+- Subscription-based premium tracking.
+- Additional languages.
+- Web application.
+
+# 17. Important Product and Safety Constraints
+
+The following constraints are mandatory design considerations:
+
+1. The application is a mental wellness and peer-support platform, not a medical diagnosis or treatment system.
+2. The application shall not recommend starting, stopping or changing prescribed medication.
+3. Community medication experiences must be clearly labeled as personal experiences.
+4. Private health information shall never be automatically shared with the community.
+5. Crisis-support workflows must be designed with qualified mental health and safety professionals.
+6. The product must undergo legal, privacy and security review before public launch.
+7. User anonymity must be accurately described and must not be marketed as absolute technical anonymity.
+8. The application shall not use sensitive health information for advertising or unrelated profiling.
+
+# 18. Final Technical Recommendation
+
+The initial implementation should use:
+
+| Layer | Recommended technology |
+|---|---|
+| Mobile | Flutter |
+| State Management | Riverpod |
+| Architecture | Clean Architecture |
+| Navigation | GoRouter |
+| Networking | Dio |
+| Backend | PHP 8.3+ / Laravel |
+| API | REST API v1 |
+| Authentication | Laravel Sanctum |
+| Database | PostgreSQL |
+| Cache | Redis |
+| Background Jobs | Laravel Queue |
+| Scheduling | Laravel Scheduler |
+| Notifications | FCM + Local Notifications |
+| Media | S3-compatible object storage |
+| Admin | Laravel web administration |
+| Documentation | OpenAPI / Swagger |
+| Deployment | Docker + Linux + Nginx |
+
+**Architecture decision:** Begin with a modular Laravel monolith, PostgreSQL and Redis. Keep the Flutter application feature-based and independent of backend implementation details. This provides a maintainable foundation without premature distributed-system complexity.
+
+**End of SRS — Version 1.0**

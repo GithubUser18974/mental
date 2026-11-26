@@ -1,0 +1,2377 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "Y API",
+    "version": "1.0.0",
+    "description": "REST API for the Y anonymous mental-health community and personal wellness tracker.\n\nAll responses use the standard envelope (`success`, `message`, `data`, `meta` / `errors`).\nSend `Accept-Language: ar` or `en` to localize messages. Every response carries an `X-Request-Id` header."
+  },
+  "servers": [
+    { "url": "http://localhost:8000/api/v1", "description": "Local development" }
+  ],
+  "tags": [
+    { "name": "Auth", "description": "Account registration, sign-in, sessions and password recovery (email + password)" },
+    { "name": "Profile", "description": "Your anonymous identity, preferences and privacy settings" },
+    { "name": "Profiles", "description": "Other members' public anonymous profiles, follows, blocks and username search" },
+    { "name": "Community", "description": "Categories, interests, posts, images, the feed, comments, reactions, saved posts, hashtag search and trending" },
+    { "name": "Safety", "description": "Reporting content to moderators" },
+    { "name": "System", "description": "Operational endpoints" }
+  ],
+  "paths": {
+    "/reports": {
+      "post": {
+        "tags": [
+          "Safety"
+        ],
+        "summary": "Report a post, comment or profile",
+        "description": "Sends the item to the moderation queue. Priority comes from the reason (suicidal content / self-harm encouragement are critical). 201 when created; 200 with the existing report when you already have a pending report on the same item. 404 if you can't see the target (including content hidden by a block); 422 for your own content. The reported member is never told who reported them. `crisis_support: true` → show crisis resources and an escalation path.",
+        "operationId": "createReport",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReportInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleReport"
+          },
+          "201": {
+            "$ref": "#/components/responses/SingleReport"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Safety"
+        ],
+        "summary": "Your reports and their status",
+        "description": "Newest first. Only reports you filed.",
+        "operationId": "listOwnReports",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ReportPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          }
+        }
+      }
+    },
+    "/profiles/{profile}/follow": {
+      "parameters": [
+        {
+          "name": "profile",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Anonymous profile id"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Profiles"
+        ],
+        "summary": "Follow a member",
+        "description": "Idempotent. 403 if the member doesn't accept followers (`follow_policy: nobody`). 404 for unknown/inactive profiles or when a block exists either way. 422 for yourself.",
+        "operationId": "followProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Following"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Profiles"
+        ],
+        "summary": "Unfollow a member",
+        "description": "Idempotent.",
+        "operationId": "unfollowProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Not following"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/profiles/{profile}/block": {
+      "parameters": [
+        {
+          "name": "profile",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "description": "Anonymous profile id"
+        }
+      ],
+      "post": {
+        "tags": [
+          "Profiles"
+        ],
+        "summary": "Block a member",
+        "description": "Idempotent. Removes follows in both directions. Afterwards neither member sees the other's posts, comments, profile or search results, and neither can interact with the other. Never reveals whether the other member blocked you. 422 for yourself.",
+        "operationId": "blockProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Blocked"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Profiles"
+        ],
+        "summary": "Unblock a member",
+        "description": "Idempotent.",
+        "operationId": "unblockProfile",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Unblocked"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/profile/followers": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Your followers",
+        "description": "Newest first. Only you can see this list. Skips inactive accounts and members hidden by a block.",
+        "operationId": "listFollowers",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProfileCardPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      }
+    },
+    "/profile/following": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Members you follow",
+        "description": "Newest first. Only you can see this list.",
+        "operationId": "listFollowing",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProfileCardPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      }
+    },
+    "/profile/blocks": {
+      "get": {
+        "tags": [
+          "Profile"
+        ],
+        "summary": "Members you blocked",
+        "description": "Newest first, for the Blocked users screen.",
+        "operationId": "listBlocked",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProfileCardPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      }
+    },
+    "/search/profiles": {
+      "get": {
+        "tags": [
+          "Profiles"
+        ],
+        "summary": "Search members by anonymous username",
+        "description": "Case-insensitive substring match (leading @ ignored), prefix matches first, up to 20 results. Never returns inactive accounts or members hidden by a block.",
+        "operationId": "searchProfiles",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "minLength": 2,
+              "maxLength": 30
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ProfileCardList"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/search/hashtags": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Search hashtags",
+        "description": "Substring match (leading # ignored), prefix matches first, then by number of public posts. Up to 20.",
+        "operationId": "searchHashtags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "maxLength": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HashtagList"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/hashtags/trending": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Trending hashtags",
+        "description": "Top 10 by public posts in the last 7 days. Posts with a content warning never count (no amplification of sensitive content).",
+        "operationId": "trendingHashtags",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/HashtagList"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          }
+        }
+      }
+    },
+    "/categories": {
+      "get": {
+        "tags": ["Community"],
+        "summary": "Active post categories (localized, display order)",
+        "operationId": "listCategories",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AcceptLanguage" }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/CategoryList" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" }
+        }
+      }
+    },
+    "/profile/interests": {
+      "get": {
+        "tags": ["Community"],
+        "summary": "Your topics of interest",
+        "operationId": "getInterests",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/CategoryList" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" }
+        }
+      },
+      "put": {
+        "tags": ["Community"],
+        "summary": "Replace your topics of interest",
+        "operationId": "updateInterests",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["categories"],
+                "properties": { "categories": { "type": "array", "items": { "type": "string", "description": "Category slug" }, "maxItems": 20 } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/CategoryList" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" }
+        }
+      }
+    },
+    "/media": {
+      "post": {
+        "tags": ["Community"],
+        "summary": "Upload a post image",
+        "description": "JPEG/PNG/WebP up to 8 MB. The image is re-encoded server-side: all metadata (EXIF GPS location, device, timestamps) is removed and it is downscaled to max 2048 px. Attach it via `media_ids` when creating/updating a post; unattached uploads are deleted after 24 h. 10 uploads/minute.",
+        "operationId": "uploadMedia",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "multipart/form-data": {
+              "schema": { "type": "object", "required": ["image"], "properties": { "image": { "type": "string", "format": "binary" } } }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Stored",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/SuccessEnvelope" },
+                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Media" } } }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/posts": {
+      "get": {
+        "tags": ["Community"],
+        "summary": "Community feed",
+        "description": "Public, visible, non-deleted posts, never from members hidden by a block either way. `popular`: last 7 days by engagement score and never includes posts with a content warning (no amplification of sensitive content). `following=true`: only members you follow. `q`: post text search.",
+        "operationId": "getFeed",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "sort", "in": "query", "schema": { "type": "string", "enum": ["recent", "popular"], "default": "recent" } },
+          { "name": "category", "in": "query", "schema": { "type": "string" }, "description": "Category slug" },
+          { "name": "hashtag", "in": "query", "schema": { "type": "string" }, "description": "With or without #, case-insensitive" },
+          { "name": "following", "in": "query", "schema": { "type": "boolean", "default": false }, "description": "Only posts from members you follow" },
+          { "name": "q", "in": "query", "schema": { "type": "string", "minLength": 2, "maxLength": 100 }, "description": "Case-insensitive post text search (literal)" },
+          { "$ref": "#/components/parameters/PerPage" },
+          { "$ref": "#/components/parameters/Cursor" },
+          { "$ref": "#/components/parameters/AcceptLanguage" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/PostPage" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" }
+        }
+      },
+      "post": {
+        "tags": ["Community"],
+        "summary": "Publish a post",
+        "description": "Hashtags are parsed from `content`. 20 posts/minute.",
+        "operationId": "createPost",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PostInput" } } } },
+        "responses": {
+          "201": { "$ref": "#/components/responses/SinglePost" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/AccountInactive" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/posts/{post}": {
+      "parameters": [{ "name": "post", "in": "path", "required": true, "schema": { "type": "string", "format": "uuid" } }],
+      "get": {
+        "tags": ["Community"],
+        "summary": "A single post",
+        "description": "404 for deleted posts and for posts the viewer may not see (only-me, under review, hidden).",
+        "operationId": "getPost",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/SinglePost" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      },
+      "put": {
+        "tags": ["Community"],
+        "summary": "Edit your post (partial)",
+        "description": "Author only (403 otherwise). Changing `content` marks the post edited. `media_ids` replaces the attached images.",
+        "operationId": "updatePost",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PostInput" } } } },
+        "responses": {
+          "200": { "$ref": "#/components/responses/SinglePost" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" }
+        }
+      },
+      "delete": {
+        "tags": ["Community"],
+        "summary": "Delete your post",
+        "description": "Author only. Removed from every endpoint immediately (retained server-side per retention policy).",
+        "operationId": "deletePost",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "204": { "description": "Deleted" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/Forbidden" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/posts/{post}/comments": {
+      "parameters": [
+        {
+          "name": "post",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Top-level comments of a post",
+        "operationId": "listComments",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Oldest first. A removed comment that still has visible replies appears as a placeholder (`is_removed`). 404 if the viewer may not see the post.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CommentPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Comment on a post or reply to a comment",
+        "operationId": "createComment",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "403 when the author turned comments off. 404 if the viewer may not see the post.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CommentInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/SingleComment"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/comments/{comment}/replies": {
+      "parameters": [
+        {
+          "name": "comment",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Replies to a top-level comment",
+        "operationId": "listCommentReplies",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Oldest first. Also works under a removed placeholder. 404 for a reply (no deeper nesting) or a post the viewer may not see.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/CommentPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      }
+    },
+    "/comments/{comment}": {
+      "parameters": [
+        {
+          "name": "comment",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "put": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Edit your comment",
+        "operationId": "updateComment",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Author only: 403 for someone else's visible comment, 404 if the viewer may not see it.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string",
+                    "maxLength": 1000
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleComment"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Delete your comment",
+        "operationId": "deleteComment",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Author only. Replies stay visible under a placeholder.",
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/posts/{post}/reactions": {
+      "parameters": [
+        {
+          "name": "post",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Set your supportive reaction",
+        "operationId": "reactToPost",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "One reaction per member per post; sending another type replaces it. 404 if the viewer may not see the post.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "type"
+                ],
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "enum": [
+                      "understand",
+                      "support",
+                      "not_alone",
+                      "proud",
+                      "thank_you"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/ReactionSummary"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Remove your reaction",
+        "operationId": "removeReaction",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Idempotent. 404 if the viewer may not see the post.",
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/posts/{post}/save": {
+      "parameters": [
+        {
+          "name": "post",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Save (bookmark) a post privately",
+        "operationId": "savePost",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Idempotent. Saved posts are never shown to anyone else. 404 if the viewer may not see the post.",
+        "responses": {
+          "204": {
+            "description": "Saved"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Remove a bookmark",
+        "operationId": "unsavePost",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Idempotent.",
+        "responses": {
+          "204": {
+            "description": "Removed"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/saved-posts": {
+      "get": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Your saved posts",
+        "operationId": "listSavedPosts",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Most recently saved first. Posts that are no longer visible to you drop out.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguage"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/PostPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      }
+    },
+    "/profiles/{username}/posts": {
+      "get": {
+        "tags": ["Community"],
+        "summary": "A member's public posts",
+        "description": "On your own profile this also includes your only-me posts. Unknown or inactive members → 404.",
+        "operationId": "getProfilePosts",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "username", "in": "path", "required": true, "schema": { "type": "string" } },
+          { "$ref": "#/components/parameters/PerPage" },
+          { "$ref": "#/components/parameters/Cursor" }
+        ],
+        "responses": {
+          "200": { "$ref": "#/components/responses/PostPage" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/profile": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Your profile, preferences and privacy settings",
+        "description": "Created automatically at registration (generated username + avatar). Contains no account credentials.",
+        "operationId": "getOwnProfile",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/OwnProfile" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/AccountInactive" }
+        }
+      },
+      "put": {
+        "tags": ["Profile"],
+        "summary": "Update username, avatar and/or bio (partial)",
+        "description": "The first update marks profile setup as complete. After setup, the username can be changed once every 30 days (`username_change_available_at`); case-only changes are always allowed.",
+        "operationId": "updateOwnProfile",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AcceptLanguage" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": { "type": "string", "pattern": "^[A-Za-z][A-Za-z0-9_]{2,19}$", "description": "Unique (case-insensitive), not reserved" },
+                  "avatar": { "type": "string", "description": "One of `GET /profile/avatar-options` → `avatars`", "example": "lotus-lavender" },
+                  "bio": { "type": ["string", "null"], "maxLength": 300, "description": "Empty string clears it" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/OwnProfile" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/profile/preferences": {
+      "put": {
+        "tags": ["Profile"],
+        "summary": "Update language and timezone (partial)",
+        "description": "`language` is used for emails and push notifications; `timezone` (IANA) for local-time display and reminders.",
+        "operationId": "updatePreferences",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "language": { "type": "string", "enum": ["en", "ar"] },
+                  "timezone": { "type": "string", "example": "Africa/Cairo" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/OwnProfile" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" }
+        }
+      }
+    },
+    "/profile/privacy": {
+      "put": {
+        "tags": ["Profile"],
+        "summary": "Update privacy settings (partial)",
+        "operationId": "updatePrivacy",
+        "security": [{ "bearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "profile_visibility": { "type": "string", "enum": ["public", "private"], "description": "private = others see only username, avatar and joined date" },
+                  "follow_policy": { "type": "string", "enum": ["everyone", "nobody"] },
+                  "analytics_consent": { "type": "boolean", "description": "Optional anonymized usage analytics (default false)" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/OwnProfile" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" }
+        }
+      }
+    },
+    "/profile/username-availability": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Check whether a username can be used",
+        "description": "Your own current username counts as available. Limited to 30 checks/minute.",
+        "operationId": "checkUsernameAvailability",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "username", "in": "query", "required": true, "schema": { "type": "string", "maxLength": 50 } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Availability",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/SuccessEnvelope" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "required": ["username", "available", "reason"],
+                          "properties": {
+                            "username": { "type": "string" },
+                            "available": { "type": "boolean" },
+                            "reason": { "type": ["string", "null"], "enum": ["invalid", "reserved", "taken", null] }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/profile/username-suggestions": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Five fresh, available generated usernames",
+        "operationId": "getUsernameSuggestions",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Suggestions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/SuccessEnvelope" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": { "usernames": { "type": "array", "items": { "type": "string" }, "example": ["QuietRiver482", "GentleWillow37"] } }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/profile/avatar-options": {
+      "get": {
+        "tags": ["Profile"],
+        "summary": "Available generated avatars (icon × color)",
+        "operationId": "getAvatarOptions",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Avatar catalog",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/SuccessEnvelope" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "icons": { "type": "array", "items": { "type": "string" } },
+                            "colors": { "type": "array", "items": { "type": "string" } },
+                            "avatars": { "type": "array", "items": { "type": "string" }, "description": "All valid `icon-color` keys" }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" }
+        }
+      }
+    },
+    "/profiles/{username}": {
+      "get": {
+        "tags": ["Profiles"],
+        "summary": "Another member's public anonymous profile",
+        "description": "Case-insensitive. Unknown, suspended and deactivated accounts — and members who blocked you — all return 404. Never contains account identifiers.",
+        "operationId": "getPublicProfile",
+        "security": [{ "bearerAuth": [] }],
+        "parameters": [
+          { "name": "username", "in": "path", "required": true, "schema": { "type": "string" } }
+        ],
+        "responses": {
+          "200": {
+            "description": "Public profile",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/SuccessEnvelope" },
+                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/PublicProfile" } } }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "404": { "$ref": "#/components/responses/NotFound" }
+        }
+      }
+    },
+    "/auth/register": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Create an account (18+, terms accepted) and sign in",
+        "operationId": "register",
+        "security": [],
+        "parameters": [{ "$ref": "#/components/parameters/AcceptLanguage" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password", "password_confirmation", "age_confirmed", "terms_accepted"],
+                "properties": {
+                  "email": { "type": "string", "format": "email", "maxLength": 254 },
+                  "password": { "type": "string", "minLength": 10, "maxLength": 128, "description": "At least one letter and one number" },
+                  "password_confirmation": { "type": "string" },
+                  "age_confirmed": { "type": "boolean", "const": true, "description": "User confirms they are 18 or older (BR-001)" },
+                  "terms_accepted": { "type": "boolean", "const": true, "description": "Terms of use and privacy policy accepted" },
+                  "device_name": { "type": ["string", "null"], "maxLength": 100 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "$ref": "#/components/responses/AuthTokenIssued" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign in with email and password",
+        "description": "Wrong password and unknown email return the same 422 response. Limited to 5 attempts/minute per account+IP.",
+        "operationId": "login",
+        "security": [],
+        "parameters": [{ "$ref": "#/components/parameters/AcceptLanguage" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "password"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "password": { "type": "string" },
+                  "device_name": { "type": ["string", "null"], "maxLength": 100 }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthTokenIssued" },
+          "403": { "$ref": "#/components/responses/AccountInactive" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/auth/me": {
+      "get": {
+        "tags": ["Auth"],
+        "summary": "The signed-in user's own (private) account",
+        "operationId": "getMe",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": {
+            "description": "Account",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/SuccessEnvelope" },
+                    { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Account" } } }
+                  ]
+                }
+              }
+            }
+          },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/AccountInactive" }
+        }
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Exchange the current token for a new one with a fresh expiry",
+        "description": "The token used for this request is revoked.",
+        "operationId": "refreshToken",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/AuthTokenIssued" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" },
+          "403": { "$ref": "#/components/responses/AccountInactive" }
+        }
+      }
+    },
+    "/auth/logout": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign out this device (revoke the current token)",
+        "operationId": "logout",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/MessageOnly" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" }
+        }
+      }
+    },
+    "/auth/logout-all": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Sign out of all devices (revoke every token)",
+        "operationId": "logoutAllDevices",
+        "security": [{ "bearerAuth": [] }],
+        "responses": {
+          "200": { "$ref": "#/components/responses/MessageOnly" },
+          "401": { "$ref": "#/components/responses/Unauthenticated" }
+        }
+      }
+    },
+    "/auth/forgot-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Email a password reset link",
+        "description": "Always returns 200 with the same message, whether or not the email has an account. The email contains a link to `PASSWORD_RESET_URL?token=…&email=…` for the app to open.",
+        "operationId": "forgotPassword",
+        "security": [],
+        "parameters": [{ "$ref": "#/components/parameters/AcceptLanguage" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email"],
+                "properties": { "email": { "type": "string", "format": "email" } }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/MessageOnly" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/auth/reset-password": {
+      "post": {
+        "tags": ["Auth"],
+        "summary": "Set a new password using the emailed token",
+        "description": "On success every existing session is revoked. Invalid/expired token and unknown email return the same 422 (`errors.token`).",
+        "operationId": "resetPassword",
+        "security": [],
+        "parameters": [{ "$ref": "#/components/parameters/AcceptLanguage" }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["email", "token", "password", "password_confirmation"],
+                "properties": {
+                  "email": { "type": "string", "format": "email" },
+                  "token": { "type": "string" },
+                  "password": { "type": "string", "minLength": 10, "maxLength": 128 },
+                  "password_confirmation": { "type": "string" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "$ref": "#/components/responses/MessageOnly" },
+          "422": { "$ref": "#/components/responses/ValidationFailed" },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": ["System"],
+        "summary": "Service health check",
+        "operationId": "getHealth",
+        "security": [],
+        "parameters": [{ "$ref": "#/components/parameters/AcceptLanguage" }],
+        "responses": {
+          "200": {
+            "description": "All dependencies reachable",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    { "$ref": "#/components/schemas/SuccessEnvelope" },
+                    {
+                      "type": "object",
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": { "status": { "type": "string", "const": "ok" } },
+                          "required": ["status"]
+                        }
+                      }
+                    }
+                  ]
+                },
+                "example": { "success": true, "message": "Service is healthy.", "data": { "status": "ok" } }
+              }
+            }
+          },
+          "503": {
+            "description": "One or more dependencies unavailable",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ErrorEnvelope" },
+                "example": { "success": false, "message": "Service is degraded.", "errors": { "redis": ["Unavailable."] } }
+              }
+            }
+          },
+          "429": { "$ref": "#/components/responses/TooManyRequests" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Sanctum personal access token"
+      }
+    },
+    "parameters": {
+      "AcceptLanguage": {
+        "name": "Accept-Language",
+        "in": "header",
+        "required": false,
+        "schema": { "type": "string", "enum": ["en", "ar"], "default": "en" }
+      },
+      "Cursor": {
+        "name": "cursor",
+        "in": "query",
+        "required": false,
+        "description": "Opaque cursor from `meta.pagination.next_cursor`",
+        "schema": { "type": "string" }
+      },
+      "PerPage": {
+        "name": "per_page",
+        "in": "query",
+        "required": false,
+        "schema": { "type": "integer", "minimum": 1, "maximum": 50, "default": 20 }
+      }
+    },
+    "schemas": {
+      "ReportInput": {
+        "type": "object",
+        "required": [
+          "target_type",
+          "target_id",
+          "reason"
+        ],
+        "properties": {
+          "target_type": {
+            "type": "string",
+            "enum": [
+              "post",
+              "comment",
+              "profile"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Post id, comment id or anonymous profile id"
+          },
+          "reason": {
+            "type": "string",
+            "enum": [
+              "harassment",
+              "dangerous_medical_advice",
+              "spam",
+              "self_harm_encouragement",
+              "suicidal_content",
+              "other"
+            ]
+          },
+          "details": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 500,
+            "description": "Required when reason is `other`"
+          }
+        }
+      },
+      "Report": {
+        "type": "object",
+        "required": [
+          "id",
+          "target_type",
+          "target_id",
+          "reason",
+          "status",
+          "crisis_support",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "target_type": {
+            "type": "string",
+            "enum": [
+              "post",
+              "comment",
+              "profile"
+            ]
+          },
+          "target_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "open",
+              "reviewing",
+              "actioned",
+              "dismissed"
+            ]
+          },
+          "crisis_support": {
+            "type": "boolean",
+            "description": "Offer crisis resources (FR-SAFETY-002)"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "ProfileCard": {
+        "type": "object",
+        "required": [
+          "id",
+          "username",
+          "avatar"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Anonymous profile id"
+          },
+          "username": {
+            "type": "string"
+          },
+          "avatar": {
+            "type": "string"
+          },
+          "is_following": {
+            "type": "boolean",
+            "description": "Whether you follow them (followers/following/search lists)"
+          }
+        }
+      },
+      "Hashtag": {
+        "type": "object",
+        "required": [
+          "name",
+          "posts_count"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Lowercase, without #"
+          },
+          "posts_count": {
+            "type": "integer"
+          }
+        }
+      },
+      "SuccessEnvelope": {
+        "type": "object",
+        "required": ["success", "message", "data"],
+        "properties": {
+          "success": { "type": "boolean", "const": true },
+          "message": { "type": "string" },
+          "data": {},
+          "meta": { "$ref": "#/components/schemas/Meta" }
+        }
+      },
+      "ErrorEnvelope": {
+        "type": "object",
+        "required": ["success", "message"],
+        "properties": {
+          "success": { "type": "boolean", "const": false },
+          "message": { "type": "string" },
+          "errors": {
+            "type": "object",
+            "description": "Field name → list of messages",
+            "additionalProperties": { "type": "array", "items": { "type": "string" } }
+          }
+        }
+      },
+      "Meta": {
+        "type": "object",
+        "properties": {
+          "pagination": { "$ref": "#/components/schemas/CursorPagination" }
+        }
+      },
+      "Account": {
+        "type": "object",
+        "description": "Private authentication identity — only ever returned to its owner.",
+        "required": ["id", "email", "email_verified", "status", "created_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "email": { "type": "string", "format": "email" },
+          "email_verified": { "type": "boolean" },
+          "status": { "type": "string", "enum": ["active", "suspended", "deactivated"] },
+          "created_at": { "type": "string", "format": "date-time", "example": "2026-11-12T10:00:00Z" }
+        }
+      },
+      "AuthToken": {
+        "type": "object",
+        "required": ["token", "token_type", "expires_at", "account"],
+        "properties": {
+          "token": { "type": "string", "description": "Send as `Authorization: Bearer <token>`. Shown only once.", "example": "01a1d1a2-…|y_wyGxwOjd4aQfu…" },
+          "token_type": { "type": "string", "const": "Bearer" },
+          "expires_at": { "type": "string", "format": "date-time", "description": "Default: 30 days after issue" },
+          "account": { "$ref": "#/components/schemas/Account" }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "required": ["slug", "name", "description", "icon"],
+        "properties": {
+          "slug": { "type": "string", "example": "recovery-journey" },
+          "name": { "type": "string", "description": "Localized" },
+          "description": { "type": "string", "description": "Localized" },
+          "icon": { "type": "string", "description": "Icon key rendered by the app", "example": "trending_up" }
+        }
+      },
+      "Media": {
+        "type": "object",
+        "required": ["id", "url", "url_expires_at", "mime", "width", "height"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "url": { "type": "string", "format": "uri", "description": "Signed, short-lived (30 min)" },
+          "url_expires_at": { "type": "string", "format": "date-time" },
+          "mime": { "type": "string", "enum": ["image/jpeg", "image/webp"] },
+          "width": { "type": "integer" },
+          "height": { "type": "integer" }
+        }
+      },
+      "PostInput": {
+        "type": "object",
+        "description": "Create: `content` and `category` required. Update: any subset.",
+        "properties": {
+          "content": { "type": "string", "minLength": 1, "maxLength": 2000 },
+          "category": { "type": "string", "description": "Active category slug" },
+          "content_warning": { "type": ["string", "null"], "enum": ["self_harm", "suicide", "eating_disorder", "substance_use", "abuse_trauma", "sensitive", null] },
+          "allow_comments": { "type": "boolean", "default": true },
+          "visibility": { "type": "string", "enum": ["community", "only_me"], "default": "community" },
+          "media_ids": { "type": "array", "items": { "type": "string", "format": "uuid" }, "maxItems": 4, "description": "Your own uploads from POST /media, in display order" }
+        }
+      },
+      "Post": {
+        "type": "object",
+        "required": ["id", "author", "category", "content", "hashtags", "content_warning", "allow_comments", "visibility", "media", "reactions", "comments_count", "is_saved", "is_own", "edited", "created_at", "updated_at"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid" },
+          "author": {
+            "type": "object",
+            "description": "Anonymous profile only — never account data",
+            "properties": {
+              "id": { "type": "string", "format": "uuid" },
+              "username": { "type": "string" },
+              "avatar": { "type": "string" }
+            }
+          },
+          "category": { "$ref": "#/components/schemas/Category" },
+          "content": { "type": "string" },
+          "hashtags": { "type": "array", "items": { "type": "string" }, "description": "Lowercase, without #" },
+          "content_warning": { "type": ["string", "null"] },
+          "allow_comments": { "type": "boolean" },
+          "visibility": { "type": "string", "enum": ["community", "only_me"] },
+          "media": { "type": "array", "items": { "$ref": "#/components/schemas/Media" } },
+          "reactions": { "$ref": "#/components/schemas/ReactionSummary" },
+          "comments_count": { "type": "integer", "description": "Visible comments and replies" },
+          "is_saved": { "type": "boolean", "description": "Whether the viewer bookmarked it (private)" },
+          "is_own": { "type": "boolean" },
+          "moderation_status": { "type": "string", "enum": ["visible", "under_review", "hidden"], "description": "Only present on your own posts" },
+          "edited": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ReactionSummary": {
+        "type": "object",
+        "required": [
+          "counts",
+          "total",
+          "mine"
+        ],
+        "description": "Counts per supportive reaction type. Who reacted is never exposed.",
+        "properties": {
+          "counts": {
+            "type": "object",
+            "required": [
+              "understand",
+              "support",
+              "not_alone",
+              "proud",
+              "thank_you"
+            ],
+            "properties": {
+              "understand": {
+                "type": "integer"
+              },
+              "support": {
+                "type": "integer"
+              },
+              "not_alone": {
+                "type": "integer"
+              },
+              "proud": {
+                "type": "integer"
+              },
+              "thank_you": {
+                "type": "integer"
+              }
+            }
+          },
+          "total": {
+            "type": "integer"
+          },
+          "mine": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "enum": [
+              "understand",
+              "support",
+              "not_alone",
+              "proud",
+              "thank_you",
+              null
+            ],
+            "description": "The viewer's own reaction"
+          }
+        }
+      },
+      "Comment": {
+        "type": "object",
+        "required": [
+          "id",
+          "post_id",
+          "parent_id",
+          "is_removed",
+          "author",
+          "content",
+          "is_own",
+          "is_post_author",
+          "edited",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "post_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Top-level comment this replies to (one level of threading)"
+          },
+          "is_removed": {
+            "type": "boolean",
+            "description": "Deleted/moderated comment kept as a placeholder because it has visible replies; author and content are null"
+          },
+          "author": {
+            "type": [
+              "object",
+              "null"
+            ],
+            "description": "Anonymous profile only — never account data",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid"
+              },
+              "username": {
+                "type": "string"
+              },
+              "avatar": {
+                "type": "string"
+              }
+            }
+          },
+          "content": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_own": {
+            "type": "boolean"
+          },
+          "is_post_author": {
+            "type": "boolean",
+            "description": "Written by the post's author (badge)"
+          },
+          "moderation_status": {
+            "type": "string",
+            "enum": [
+              "visible",
+              "under_review",
+              "hidden"
+            ],
+            "description": "Only present on your own comments"
+          },
+          "replies_count": {
+            "type": "integer",
+            "description": "Top-level comments only"
+          },
+          "edited": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "CommentInput": {
+        "type": "object",
+        "required": [
+          "content"
+        ],
+        "properties": {
+          "content": {
+            "type": "string",
+            "maxLength": 1000
+          },
+          "parent_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "Create only. Replying to a reply attaches to its top-level comment."
+          }
+        }
+      },
+      "PublicProfile": {
+        "type": "object",
+        "description": "What other members see. `bio` is null for private profiles and for members you blocked.",
+        "required": ["id", "username", "avatar", "bio", "is_private", "joined_on", "stats", "relationship"],
+        "properties": {
+          "id": { "type": "string", "format": "uuid", "description": "Anonymous profile id (not the account id)" },
+          "username": { "type": "string" },
+          "avatar": { "type": "string", "example": "leaf-mint" },
+          "bio": { "type": ["string", "null"] },
+          "is_private": { "type": "boolean" },
+          "joined_on": { "type": "string", "format": "date" },
+          "stats": {
+            "type": "object",
+            "required": ["followers", "following"],
+            "properties": { "followers": { "type": "integer" }, "following": { "type": "integer" } }
+          },
+          "relationship": {
+            "type": "object",
+            "description": "Your relationship with this member",
+            "required": ["is_self", "is_following", "follows_you", "is_blocked", "can_follow"],
+            "properties": {
+              "is_self": { "type": "boolean" },
+              "is_following": { "type": "boolean" },
+              "follows_you": { "type": "boolean" },
+              "is_blocked": { "type": "boolean", "description": "You blocked them" },
+              "can_follow": { "type": "boolean", "description": "Show a Follow button" }
+            }
+          }
+        }
+      },
+      "OwnProfile": {
+        "type": "object",
+        "required": ["profile", "preferences", "privacy"],
+        "properties": {
+          "profile": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string", "format": "uuid" },
+              "username": { "type": "string" },
+              "avatar": { "type": "string" },
+              "bio": { "type": ["string", "null"] },
+              "setup_completed": { "type": "boolean", "description": "False until the first profile update (drives onboarding)" },
+              "username_change_available_at": { "type": ["string", "null"], "format": "date-time", "description": "Null when the username can be changed now" },
+              "joined_on": { "type": "string", "format": "date" }
+            }
+          },
+          "preferences": {
+            "type": "object",
+            "properties": {
+              "language": { "type": "string", "enum": ["en", "ar"] },
+              "timezone": { "type": "string" }
+            }
+          },
+          "privacy": {
+            "type": "object",
+            "properties": {
+              "profile_visibility": { "type": "string", "enum": ["public", "private"] },
+              "follow_policy": { "type": "string", "enum": ["everyone", "nobody"] },
+              "analytics_consent": { "type": "boolean" }
+            }
+          }
+        }
+      },
+      "CursorPagination": {
+        "type": "object",
+        "required": ["per_page", "next_cursor", "prev_cursor", "has_more"],
+        "properties": {
+          "per_page": { "type": "integer" },
+          "next_cursor": { "type": ["string", "null"] },
+          "prev_cursor": { "type": ["string", "null"] },
+          "has_more": { "type": "boolean" }
+        }
+      }
+    },
+    "responses": {
+      "SingleReport": {
+        "description": "Report",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Report"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ReportPage": {
+        "description": "Cursor-paginated reports",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Report"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ProfileCardPage": {
+        "description": "Cursor-paginated profiles",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProfileCard"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ProfileCardList": {
+        "description": "Profiles",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ProfileCard"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "HashtagList": {
+        "description": "Hashtags",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Hashtag"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SingleComment": {
+        "description": "Comment",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Comment"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "CommentPage": {
+        "description": "Cursor-paginated comments, oldest first",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Comment"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "ReactionSummary": {
+        "description": "Fresh reaction counts",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/ReactionSummary"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "AuthTokenIssued": {
+        "description": "Signed in — new bearer token",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/SuccessEnvelope" },
+                { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/AuthToken" } } }
+              ]
+            }
+          }
+        }
+      },
+      "CategoryList": {
+        "description": "Categories",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/SuccessEnvelope" },
+                { "type": "object", "properties": { "data": { "type": "array", "items": { "$ref": "#/components/schemas/Category" } } } }
+              ]
+            }
+          }
+        }
+      },
+      "SinglePost": {
+        "description": "Post",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/SuccessEnvelope" },
+                { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/Post" } } }
+              ]
+            }
+          }
+        }
+      },
+      "PostPage": {
+        "description": "Cursor-paginated posts",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/SuccessEnvelope" },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": { "type": "array", "items": { "$ref": "#/components/schemas/Post" } },
+                    "meta": { "$ref": "#/components/schemas/Meta" }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "OwnProfile": {
+        "description": "Your profile, preferences and privacy",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                { "$ref": "#/components/schemas/SuccessEnvelope" },
+                { "type": "object", "properties": { "data": { "$ref": "#/components/schemas/OwnProfile" } } }
+              ]
+            }
+          }
+        }
+      },
+      "MessageOnly": {
+        "description": "Success with a message and no data",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/SuccessEnvelope" },
+            "example": { "success": true, "message": "You have been signed out.", "data": null }
+          }
+        }
+      },
+      "AccountInactive": {
+        "description": "Account is suspended or deactivated",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorEnvelope" },
+            "example": { "success": false, "message": "This account can’t be used right now. Please contact support." }
+          }
+        }
+      },
+      "ValidationFailed": {
+        "description": "Request validation failed",
+        "content": {
+          "application/json": {
+            "schema": { "$ref": "#/components/schemas/ErrorEnvelope" },
+            "example": { "success": false, "message": "Validation failed.", "errors": { "score": ["The score field must be between 1 and 10."] } }
+          }
+        }
+      },
+      "Unauthenticated": {
+        "description": "Missing or invalid token",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "Forbidden": {
+        "description": "Authenticated but not allowed",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "NotFound": {
+        "description": "Resource not found — also returned for other users' private records",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "TooManyRequests": {
+        "description": "Rate limit exceeded; see `Retry-After` header",
+        "headers": { "Retry-After": { "schema": { "type": "integer" } } },
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      },
+      "ServerError": {
+        "description": "Unexpected error (details are never exposed)",
+        "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ErrorEnvelope" } } }
+      }
+    }
+  }
+}
