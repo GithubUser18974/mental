@@ -4,25 +4,29 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mindful/app/app.dart';
 import 'package:mindful/app/provider_overrides.dart';
 import 'package:mindful/core/network/api_client.dart';
+import 'package:mindful/core/notifications/local_reminders.dart';
 import 'package:mindful/core/storage/token_storage.dart';
+import 'package:mindful/core/time/device_timezone.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'fake_backend.dart';
 import 'fakes.dart';
 
 /// Boots the real app (router, theme, l10n, providers) against a [FakeBackend].
-Future<({FakeBackend backend, FakeTokenStorage tokens})> pumpYApp(
+Future<({FakeBackend backend, FakeTokenStorage tokens, FakeLocalReminders reminders})> pumpYApp(
   WidgetTester tester, {
   FakeBackend? backend,
   String? token,
   DateTime? expiresAt,
   Map<String, Object> prefs = const {},
+  String deviceTimezone = 'UTC',
 }) async {
   usePhoneViewport(tester);
   SharedPreferences.setMockInitialValues(prefs);
   final sharedPrefs = await SharedPreferences.getInstance();
   final fake = backend ?? FakeBackend();
   final tokens = FakeTokenStorage(token, expiresAt);
+  final reminders = FakeLocalReminders();
 
   await tester.pumpWidget(
     ProviderScope(
@@ -31,13 +35,16 @@ Future<({FakeBackend backend, FakeTokenStorage tokens})> pumpYApp(
         ...appProviderOverrides(sharedPrefs),
         tokenStorageProvider.overrideWithValue(tokens),
         httpClientAdapterProvider.overrideWithValue(fake.adapter),
+        // No platform plugins in widget tests.
+        localRemindersProvider.overrideWithValue(reminders),
+        deviceTimezoneProvider.overrideWithValue(() async => deviceTimezone),
       ],
       child: const YApp(),
     ),
   );
   await tester.pumpAndSettle();
 
-  return (backend: fake, tokens: tokens);
+  return (backend: fake, tokens: tokens, reminders: reminders);
 }
 
 /// A typical phone (Pixel-class, 411×891 logical px) instead of the 800×600 default.

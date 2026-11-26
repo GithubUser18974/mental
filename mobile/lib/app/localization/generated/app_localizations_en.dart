@@ -1144,4 +1144,251 @@ class AppLocalizationsEn extends AppLocalizations {
   String qualityValue(int value) {
     return 'Quality $value/10';
   }
+
+  @override
+  String get reminderBody => 'It\'s time for your reminder.';
+
+  @override
+  String get navMeds => 'Meds';
+
+  @override
+  String get medsTitle => 'Your medications';
+
+  @override
+  String get medsDisclaimer =>
+      'Your own records, not medical advice. Talk to your clinician before changing anything.';
+
+  @override
+  String get todayDoses => 'Today';
+
+  @override
+  String get noDosesToday => 'No scheduled doses today.';
+
+  @override
+  String get doseTaken => 'Taken';
+
+  @override
+  String get doseSkip => 'Skip';
+
+  @override
+  String get doseStatusTaken => 'Taken';
+
+  @override
+  String get doseStatusSkipped => 'Skipped';
+
+  @override
+  String get doseStatusMissed => 'Missed';
+
+  @override
+  String get doseStatusDelayed => 'Taken late';
+
+  @override
+  String markTaken(String name, String time) {
+    return 'Mark $name at $time as taken';
+  }
+
+  @override
+  String markSkipped(String name, String time) {
+    return 'Skip $name at $time';
+  }
+
+  @override
+  String get currentMeds => 'Current';
+
+  @override
+  String get pastMeds => 'Past medications';
+
+  @override
+  String get noMeds => 'Add a medication to keep track of doses and how you feel.';
+
+  @override
+  String get noPastMeds => 'No past medications.';
+
+  @override
+  String get addMedication => 'Add medication';
+
+  @override
+  String get medPaused => 'Paused';
+
+  @override
+  String get medDiscontinued => 'Stopped';
+
+  @override
+  String get remindersOff => 'Reminders off';
+
+  @override
+  String get scheduleDaily => 'Every day';
+
+  @override
+  String get scheduleWeekly => 'Some days';
+
+  @override
+  String get scheduleInterval => 'Every few days';
+
+  @override
+  String get scheduleAsNeeded => 'As needed';
+
+  @override
+  String scheduleEveryNDays(int count) {
+    return 'Every $count days';
+  }
+
+  @override
+  String scheduleAt(String times) {
+    return 'at $times';
+  }
+
+  @override
+  String get medFormNew => 'Add medication';
+
+  @override
+  String get medFormEdit => 'Edit medication';
+
+  @override
+  String get medFormSubtitle =>
+      'Only you can see this. It\'s a personal record, not a prescription.';
+
+  @override
+  String get medName => 'Medication name';
+
+  @override
+  String get medNameRequired => 'Please enter a name.';
+
+  @override
+  String get medDosage => 'Dosage';
+
+  @override
+  String get medDosageInvalid => 'Use a number, like 50 or 0.5.';
+
+  @override
+  String get medUnit => 'Unit';
+
+  @override
+  String get medStartDate => 'Start date';
+
+  @override
+  String get medEndDate => 'End date (optional)';
+
+  @override
+  String get medNoEndDate => 'No end date';
+
+  @override
+  String get medSchedule => 'When do you take it?';
+
+  @override
+  String get medTimes => 'Times';
+
+  @override
+  String get medAddTime => 'Add a time';
+
+  @override
+  String medRemoveTime(String time) {
+    return 'Remove $time';
+  }
+
+  @override
+  String get medTimesRequired => 'Add at least one time.';
+
+  @override
+  String get medDays => 'Days';
+
+  @override
+  String get medDaysRequired => 'Choose at least one day.';
+
+  @override
+  String medIntervalDays(int count) {
+    return 'Every $count days';
+  }
+
+  @override
+  String get medReminders => 'Reminders';
+
+  @override
+  String get medRemindersHelp =>
+      'Notifications only say “It\'s time for your reminder” — never the medication name.';
+
+  @override
+  String get medInstructions => 'Instructions (optional)';
+
+  @override
+  String get medInstructionsHint => 'e.g. with food';
+
+  @override
+  String get medClinician => 'Clinician (optional)';
+
+  @override
+  String get medNotes => 'Personal notes (optional)';
+
+  @override
+  String get medDetailsTitle => 'Medication';
+
+  @override
+  String medStarted(String date) {
+    return 'Since $date';
+  }
+
+  @override
+  String medUntil(String date) {
+    return 'Until $date';
+  }
+
+  @override
+  String get medPause => 'Pause';
+
+  @override
+  String get medResume => 'Resume';
+
+  @override
+  String get medStop => 'Mark as stopped';
+
+  @override
+  String get medStopConfirm =>
+      'Mark this medication as stopped? Its reminders will end. Your history stays.';
+
+  @override
+  String get medDelete => 'Delete medication';
+
+  @override
+  String get medDeleteConfirm =>
+      'Delete this medication and everything recorded for it? This can\'t be undone.';
+
+  @override
+  String get medLogAsNeeded => 'I took a dose';
+
+  @override
+  String get medHistory => 'Recent doses';
+
+  @override
+  String get medHistoryEmpty => 'No doses recorded yet.';
+
+  @override
+  String get medExperiences => 'How it\'s going';
+
+  @override
+  String get medExperiencesEmpty =>
+      'Note benefits, side effects or changes you notice. Only you can see them.';
+
+  @override
+  String get medAddExperience => 'Add a note';
+
+  @override
+  String get expBenefit => 'Benefit';
+
+  @override
+  String get expSideEffect => 'Side effect';
+
+  @override
+  String get expChange => 'Change I noticed';
+
+  @override
+  String get expGeneral => 'General';
+
+  @override
+  String get expDescription => 'What did you notice?';
+
+  @override
+  String get expDelete => 'Delete note';
+
+  @override
+  String get unitOther => 'other';
 }

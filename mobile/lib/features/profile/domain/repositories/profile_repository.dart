@@ -9,6 +9,9 @@ abstract interface class ProfileRepository {
 
   Future<OwnProfile> updatePrivacy(PrivacySettings privacy);
 
+  /// Language and/or IANA timezone (dates, streaks and reminders follow it).
+  Future<OwnProfile> updatePreferences({String? language, String? timezone});
+
   Future<UsernameAvailability> checkUsername(String username);
 
   Future<List<String>> suggestUsernames();

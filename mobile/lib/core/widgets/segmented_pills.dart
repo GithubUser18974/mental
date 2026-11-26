@@ -78,12 +78,18 @@ class _Segment extends StatelessWidget {
             child: SizedBox(
               height: 40,
               child: Center(
-                child: Text(
-                  label,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: context.textStyles.labelLarge?.copyWith(
-                    color: selected ? p.onPrimary : p.textSecondary,
+                // Long labels shrink to fit rather than being cut off.
+                child: Padding(
+                  padding: const EdgeInsetsDirectional.symmetric(horizontal: AppSpacing.xxs),
+                  child: FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Text(
+                      label,
+                      maxLines: 1,
+                      style: context.textStyles.labelLarge?.copyWith(
+                        color: selected ? p.onPrimary : p.textSecondary,
+                      ),
+                    ),
                   ),
                 ),
               ),

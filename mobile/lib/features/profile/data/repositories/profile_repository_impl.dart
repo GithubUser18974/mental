@@ -46,6 +46,16 @@ class ProfileRepositoryImpl implements ProfileRepository {
   }
 
   @override
+  Future<OwnProfile> updatePreferences({String? language, String? timezone}) async {
+    final envelope = await _api.put(
+      '/profile/preferences',
+      parse: _own,
+      body: {'language': ?language, 'timezone': ?timezone},
+    );
+    return envelope.data;
+  }
+
+  @override
   Future<UsernameAvailability> checkUsername(String username) async {
     final envelope = await _api.get(
       '/profile/username-availability',

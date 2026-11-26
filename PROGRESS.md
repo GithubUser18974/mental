@@ -10,7 +10,7 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 
 ## Current status
 
-- **Active task:** T4.1 — awaiting user review (next: T4.2)
+- **Active task:** T4.2 — awaiting user review (next: T5.1)
 - **Last updated:** 2026-11-26
 
 ---
@@ -54,8 +54,8 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 
 | ID | Task | Status |
 |---|---|---|
-| T4.1 | Backend medications (encrypted), schedules (timezone/DST-safe), intake logs, experiences, reminder scheduling that stops on discontinue | 🔍 |
-| T4.2 | Flutter: medication list/add/details/schedule, intake history, experiences, local reminders (generic text) | ⬜ |
+| T4.1 | Backend medications (encrypted), schedules (timezone/DST-safe), intake logs, experiences, reminder scheduling that stops on discontinue | ✅ |
+| T4.2 | Flutter: medication list/add/details/schedule, intake history, experiences, local reminders (generic text) | 🔍 |
 
 ## Phase 5 — Private Journal
 
@@ -158,6 +158,7 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 | 2026-11-26 | Mobile tracking: new **Track** tab (Community · Track · Me), built only when opened so no health data is fetched up front; tracking data lives only in memory (autoDispose providers, wiped on sign-out) — **no local cache**. Charts are drawn in-app (no chart package): 7-day bar strip + month mood calendar. Optional scales start empty ("Add") so skipping never records a made-up value. "Very sad" uses a frowning face (the Material "very dissatisfied" icon has X-eyes — inappropriate here). Sleep is logged as hours in half-hour steps; symptom duration as preset chips. Not yet: hiding tracking screens from the app switcher (needs a platform flag/plugin — revisit with journal in T5.2). |
 | 2026-11-26 | Medication (FR-MED-*): member-maintained records, **not prescriptions**; owned by the account. Encrypted: name, dosage, instructions, clinician, notes, log notes, experience text (so lists sort by date added; the app sorts by name). Units = fixed list. One schedule per medication: `daily` (1–8 times), `weekly` (ISO weekdays), `interval` (every 2–90 days from start), `as_needed`; temporary = start/end dates. Status active / paused / discontinued (discontinued_at stamped). Hard delete with schedule, logs, experiences. |
 | 2026-11-26 | Reminders: SRS asks for **local notifications** → the backend exposes `GET /medications/doses` (local days, ≤ 31) for **active** medications, ids only (no names), each with `reminder` and its log; the app schedules notifications from it (T4.2). Times are wall-clock in the member's **current** timezone (follows travel); DST: nonexistent times move forward, repeated times fire once. Paused/discontinued → no doses (SRS §13.3 #7). Logging the same scheduled dose again updates it; `taken_at` required for taken/delayed only. "Missed" is recorded by the member (no automatic marking yet — revisit with adherence in T6.1). |
+| 2026-11-26 | Packages added (user approved T4.2): `flutter_local_notifications` (SRS stack), `timezone` (in flutter.md), `flutter_timezone` (device IANA zone). Android: core-library desugaring, POST_NOTIFICATIONS + RECEIVE_BOOT_COMPLETED, scheduled/boot receivers; **inexact** alarms only (no exact-alarm permission → reminders may be a few minutes late). iOS: notification-center delegate. Reminders = next 7 days of the server dose list (active, reminders on, not logged, future), rebuilt after every medication change and when the Meds tab opens; text is always "It's time for your reminder." (never names/doses); all cancelled whenever the session ends. Permission is asked the first time a medication with reminders is saved. The device timezone is sent to `/profile/preferences` when it differs (once per zone per session). Medication-experience → community post (FR-MED-007) not built yet: needs an explicit confirmation flow without putting health text in URLs — do with journal → post (T5.2). |
 | 2026-11-12 | CI = GitHub Actions (backend + mobile workflows, path-filtered) + Dependabot. Deploy stages (SRS §14.3 steps 8–9) deferred to T11.2 (no hosting chosen yet). Android APK build runs on pushes only, not PRs. |
 | 2026-11-12 | Debug-only `/dev/design` showcase route; welcome "Get started" opens it until T1.3. Android debug build allows cleartext to local API; iOS `NSAllowsLocalNetworking`. |
 
@@ -316,3 +317,11 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
   - Endpoints (SRS §8.6 + extras): `GET|POST /medications`, `GET|PUT|DELETE /medications/{id}`, `GET|POST /medications/{id}/logs`, `DELETE …/logs/{logId}`, `GET|POST /medications/{id}/experiences`, `DELETE …/experiences/{experienceId}`, `GET /medications/doses`. OpenAPI: 12 operations, `Medication` tag.
   - Tests: 45 new (every schedule type, SRS §13.3 #1 cross-user 404 on every route, #7 discontinue/pause stops doses, #9 invalid records, encryption at rest, current vs past, partial edit, cascade delete, intake upsert & validation, experiences, timezone-aware doses, weekdays/interval/temporary, DST spring-forward & fall-back incl. nonexistent/repeated times, timezone change).
   - Verified: `composer ci` ✔ (pint, phpstan 0, pest 389/389, audit); live smoke test (doses listed, intake recorded, discontinue → no doses, name encrypted in Postgres).
+- **T4.1 approved.** Started T4.2.
+- **T4.2 finished** (awaiting review):
+  - Core: `LocalReminders` (interface + flutter_local_notifications implementation) with a session guard that cancels everything on sign-out/expiry; `deviceTimezoneProvider`. Profile: `updatePreferences`, `timezoneSyncProvider`.
+  - `features/medication`: entities, Freezed DTOs, repository (sorts by name on device), providers (`medicationsProvider`, `medicationProvider`, `todayDosesProvider`, intake history, experiences, `ReminderSync`, `MedicationActions`).
+  - Screens: Meds tab (`MedsPage`: disclaimer, today's doses with Taken/Skip, current list, add, past link), `MedicationFormPage` (name, dosage + unit, start/end dates, schedule type, times, weekdays, every-N-days, reminders, instructions, clinician, notes), `MedicationDetailPage` (info, as-needed "I took a dose", pause/resume, stop with confirm, recent doses, private experience notes, delete), `PastMedicationsPage`. Shell now has 4 tabs (Community · Track · Meds · Me); private tabs build only when opened. `SegmentedPills` labels scale down instead of truncating.
+  - Fixed while testing: the timezone sync could loop forever if the server answered with a different zone (once-per-zone guard).
+  - Tests: 9 new flow tests (no medication requests before the tab opens, empty state + disclaimer, add with validation → body + permission + only future/unlogged/reminder doses scheduled with generic text and no name, weekly needs a day, log today's dose, stopping clears reminders, experience note, sign-out cancels reminders, device timezone sent). `flutter test` 125/125, analyze 0. Fake reminders + fixed device timezone wired into `pumpYApp`.
+  - Emulator: native build with the new plugins compiled and ran; Meds tab and Add medication form verified visually (screenshots in `docs/screenshots/t4.2/`). On-device alarm registration NOT verified — the user was using the emulator, so automation stopped.

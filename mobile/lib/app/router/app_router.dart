@@ -18,6 +18,9 @@ import 'package:mindful/features/community/presentation/pages/post_list_page.dar
 import 'package:mindful/features/community/presentation/pages/public_profile_page.dart';
 import 'package:mindful/features/community/presentation/pages/search_page.dart';
 import 'package:mindful/features/home/presentation/pages/home_page.dart';
+import 'package:mindful/features/medication/presentation/pages/medication_detail_page.dart';
+import 'package:mindful/features/medication/presentation/pages/medication_form_page.dart';
+import 'package:mindful/features/medication/presentation/pages/past_medications_page.dart';
 import 'package:mindful/features/onboarding/presentation/pages/onboarding_intro_page.dart';
 import 'package:mindful/features/onboarding/presentation/pages/welcome_page.dart';
 import 'package:mindful/features/profile/presentation/pages/profile_setup_page.dart';
@@ -93,6 +96,17 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(path: AppRoutes.search, builder: (_, _) => const SearchPage()),
+      // `/meds/new` and `/meds/past` before `/meds/:id`.
+      GoRoute(path: AppRoutes.medicationNew, builder: (_, _) => const MedicationFormPage()),
+      GoRoute(path: AppRoutes.medicationsPast, builder: (_, _) => const PastMedicationsPage()),
+      GoRoute(
+        path: AppRoutes.medicationEdit,
+        builder: (_, state) => MedicationFormPage(medicationId: state.pathParameters['id']),
+      ),
+      GoRoute(
+        path: AppRoutes.medicationDetail,
+        builder: (_, state) => MedicationDetailPage(medicationId: state.pathParameters['id'] ?? ''),
+      ),
       GoRoute(path: AppRoutes.trackCheckIn, builder: (_, _) => const CheckInPage()),
       GoRoute(
         path: AppRoutes.trackCheckInEdit,

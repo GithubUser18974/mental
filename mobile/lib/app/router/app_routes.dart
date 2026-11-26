@@ -42,6 +42,16 @@ abstract final class AppRoutes {
   static const String trackHistory = '/track/history';
   static const String trackInsights = '/track/insights';
 
+  /// Private medications (FR-MED-*). Opaque ids only in paths.
+  static const String medicationNew = '/meds/new';
+  static const String medicationsPast = '/meds/past';
+  static const String medicationDetail = '/meds/:id';
+  static const String medicationEdit = '/meds/:id/edit';
+
+  static String medicationPath(String id) => '/meds/$id';
+
+  static String medicationEditPath(String id) => '/meds/$id/edit';
+
   static String trackCheckInPath(String id) => '/track/check-in/$id';
 
   static String trackSymptomPath(String id) => '/track/symptom/$id';

@@ -1162,4 +1162,247 @@ class AppLocalizationsAr extends AppLocalizations {
   String qualityValue(int value) {
     return 'الجودة $value/10';
   }
+
+  @override
+  String get reminderBody => 'حان وقت التذكير.';
+
+  @override
+  String get navMeds => 'أدويتي';
+
+  @override
+  String get medsTitle => 'أدويتك';
+
+  @override
+  String get medsDisclaimer =>
+      'هذه سجلاتك الخاصة وليست نصيحة طبية. تحدّث إلى مختصك الصحي قبل تغيير أي شيء.';
+
+  @override
+  String get todayDoses => 'اليوم';
+
+  @override
+  String get noDosesToday => 'لا توجد جرعات مجدولة اليوم.';
+
+  @override
+  String get doseTaken => 'تم';
+
+  @override
+  String get doseSkip => 'تخطٍّ';
+
+  @override
+  String get doseStatusTaken => 'تم تناولها';
+
+  @override
+  String get doseStatusSkipped => 'تم تخطيها';
+
+  @override
+  String get doseStatusMissed => 'فائتة';
+
+  @override
+  String get doseStatusDelayed => 'متأخرة';
+
+  @override
+  String markTaken(String name, String time) {
+    return 'تسجيل $name الساعة $time كمأخوذة';
+  }
+
+  @override
+  String markSkipped(String name, String time) {
+    return 'تخطي $name الساعة $time';
+  }
+
+  @override
+  String get currentMeds => 'الحالية';
+
+  @override
+  String get pastMeds => 'الأدوية السابقة';
+
+  @override
+  String get noMeds => 'أضف دواءً لتتابع جرعاتك وشعورك.';
+
+  @override
+  String get noPastMeds => 'لا توجد أدوية سابقة.';
+
+  @override
+  String get addMedication => 'إضافة دواء';
+
+  @override
+  String get medPaused => 'متوقف مؤقتًا';
+
+  @override
+  String get medDiscontinued => 'متوقف';
+
+  @override
+  String get remindersOff => 'التذكيرات متوقفة';
+
+  @override
+  String get scheduleDaily => 'كل يوم';
+
+  @override
+  String get scheduleWeekly => 'أيام محددة';
+
+  @override
+  String get scheduleInterval => 'كل عدة أيام';
+
+  @override
+  String get scheduleAsNeeded => 'عند الحاجة';
+
+  @override
+  String scheduleEveryNDays(int count) {
+    return 'كل $count أيام';
+  }
+
+  @override
+  String scheduleAt(String times) {
+    return 'في $times';
+  }
+
+  @override
+  String get medFormNew => 'إضافة دواء';
+
+  @override
+  String get medFormEdit => 'تعديل الدواء';
+
+  @override
+  String get medFormSubtitle => 'لا يراه أحد غيرك. إنه سجل شخصي وليس وصفة طبية.';
+
+  @override
+  String get medName => 'اسم الدواء';
+
+  @override
+  String get medNameRequired => 'يرجى إدخال الاسم.';
+
+  @override
+  String get medDosage => 'الجرعة';
+
+  @override
+  String get medDosageInvalid => 'استخدم رقمًا مثل 50 أو 0.5.';
+
+  @override
+  String get medUnit => 'الوحدة';
+
+  @override
+  String get medStartDate => 'تاريخ البدء';
+
+  @override
+  String get medEndDate => 'تاريخ الانتهاء (اختياري)';
+
+  @override
+  String get medNoEndDate => 'بدون تاريخ انتهاء';
+
+  @override
+  String get medSchedule => 'متى تتناوله؟';
+
+  @override
+  String get medTimes => 'الأوقات';
+
+  @override
+  String get medAddTime => 'إضافة وقت';
+
+  @override
+  String medRemoveTime(String time) {
+    return 'إزالة $time';
+  }
+
+  @override
+  String get medTimesRequired => 'أضف وقتًا واحدًا على الأقل.';
+
+  @override
+  String get medDays => 'الأيام';
+
+  @override
+  String get medDaysRequired => 'اختر يومًا واحدًا على الأقل.';
+
+  @override
+  String medIntervalDays(int count) {
+    return 'كل $count أيام';
+  }
+
+  @override
+  String get medReminders => 'التذكيرات';
+
+  @override
+  String get medRemindersHelp => 'تقول الإشعارات فقط «حان وقت التذكير» ولا تذكر اسم الدواء أبدًا.';
+
+  @override
+  String get medInstructions => 'التعليمات (اختياري)';
+
+  @override
+  String get medInstructionsHint => 'مثال: مع الطعام';
+
+  @override
+  String get medClinician => 'المختص الصحي (اختياري)';
+
+  @override
+  String get medNotes => 'ملاحظات شخصية (اختياري)';
+
+  @override
+  String get medDetailsTitle => 'الدواء';
+
+  @override
+  String medStarted(String date) {
+    return 'منذ $date';
+  }
+
+  @override
+  String medUntil(String date) {
+    return 'حتى $date';
+  }
+
+  @override
+  String get medPause => 'إيقاف مؤقت';
+
+  @override
+  String get medResume => 'استئناف';
+
+  @override
+  String get medStop => 'تحديد كمتوقف';
+
+  @override
+  String get medStopConfirm => 'هل تريد تحديد هذا الدواء كمتوقف؟ ستتوقف تذكيراته ويبقى سجلك.';
+
+  @override
+  String get medDelete => 'حذف الدواء';
+
+  @override
+  String get medDeleteConfirm => 'هل تريد حذف هذا الدواء وكل ما سُجل له؟ لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get medLogAsNeeded => 'تناولت جرعة';
+
+  @override
+  String get medHistory => 'الجرعات الأخيرة';
+
+  @override
+  String get medHistoryEmpty => 'لم تُسجل أي جرعات بعد.';
+
+  @override
+  String get medExperiences => 'كيف تسير الأمور';
+
+  @override
+  String get medExperiencesEmpty =>
+      'دوّن الفوائد أو الآثار الجانبية أو التغيرات التي تلاحظها. لا يراها أحد غيرك.';
+
+  @override
+  String get medAddExperience => 'إضافة ملاحظة';
+
+  @override
+  String get expBenefit => 'فائدة';
+
+  @override
+  String get expSideEffect => 'أثر جانبي';
+
+  @override
+  String get expChange => 'تغيّر لاحظته';
+
+  @override
+  String get expGeneral => 'عام';
+
+  @override
+  String get expDescription => 'ماذا لاحظت؟';
+
+  @override
+  String get expDelete => 'حذف الملاحظة';
+
+  @override
+  String get unitOther => 'أخرى';
 }
