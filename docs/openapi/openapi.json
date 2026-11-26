@@ -15,9 +15,493 @@
     { "name": "Community", "description": "Categories, interests, posts, images, the feed, comments, reactions, saved posts, hashtag search and trending" },
     { "name": "Safety", "description": "Reporting content to moderators" },
     { "name": "Tracking", "description": "Private mood, symptom and sleep tracking, overview and insights (owner-only)" },
+    { "name": "Medication", "description": "Private medication records, schedules, intake logs, experiences and doses (owner-only; not prescriptions)" },
     { "name": "System", "description": "Operational endpoints" }
   ],
   "paths": {
+    "/medications": {
+      "get": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "My medications",
+        "operationId": "listMedications",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "status",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "current",
+                "past",
+                "all"
+              ],
+              "default": "current"
+            }
+          },
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MedicationPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Add a medication",
+        "operationId": "createMedication",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MedicationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/SingleMedication"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/medications/doses": {
+      "get": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Scheduled doses of active medications",
+        "operationId": "listDoses",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "description": "Local days in the member's timezone (default today, max 31). Paused/discontinued medications produce no doses. Source for local reminders.",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/DoseList"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          }
+        }
+      }
+    },
+    "/medications/{id}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Medication details",
+        "operationId": "getMedication",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleMedication"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Update / pause / discontinue a medication",
+        "operationId": "updateMedication",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MedicationInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/SingleMedication"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Delete a medication permanently",
+        "operationId": "deleteMedication",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/medications/{id}/logs": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Intake history",
+        "operationId": "listMedicationLogs",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MedicationLogPage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Record a dose",
+        "operationId": "recordIntake",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MedicationLogInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/SingleMedicationLog"
+          },
+          "200": {
+            "$ref": "#/components/responses/SingleMedicationLog"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/medications/{id}/logs/{logId}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "logId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "delete": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Delete an intake log",
+        "operationId": "deleteMedicationLog",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/medications/{id}/experiences": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "get": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Recorded experiences",
+        "operationId": "listMedicationExperiences",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PerPage"
+          },
+          {
+            "$ref": "#/components/parameters/Cursor"
+          }
+        ],
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/MedicationExperiencePage"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Add an experience",
+        "operationId": "createMedicationExperience",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MedicationExperienceInput"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "$ref": "#/components/responses/SingleMedicationExperience"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "$ref": "#/components/responses/ValidationFailed"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/medications/{id}/experiences/{experienceId}": {
+      "parameters": [
+        {
+          "name": "id",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        },
+        {
+          "name": "experienceId",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      ],
+      "delete": {
+        "tags": [
+          "Medication"
+        ],
+        "summary": "Delete an experience",
+        "operationId": "deleteMedicationExperience",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Deleted"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
     "/tracking/moods": {
       "get": {
         "tags": [
@@ -2195,6 +2679,438 @@
       }
     },
     "schemas": {
+      "MedicationSchedule": {
+        "type": "object",
+        "required": [
+          "type"
+        ],
+        "description": "daily (times), weekly (times + days_of_week ISO 1=Mon…7=Sun), interval (times + every interval_days), as_needed (no times). Times are local wall-clock HH:MM in the member's current timezone.",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "weekly",
+              "interval",
+              "as_needed"
+            ]
+          },
+          "times": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "type": "string",
+              "pattern": "^\\d{2}:\\d{2}$"
+            }
+          },
+          "days_of_week": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 7
+            }
+          },
+          "interval_days": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 2,
+            "maximum": 90
+          }
+        }
+      },
+      "Medication": {
+        "type": "object",
+        "description": "Member-maintained record — not a prescription. Owner only.",
+        "required": [
+          "id",
+          "name",
+          "dosage",
+          "unit",
+          "start_date",
+          "status",
+          "is_current",
+          "reminders_enabled",
+          "schedule"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "dosage": {
+            "type": "string"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "mg",
+              "mcg",
+              "g",
+              "ml",
+              "drops",
+              "tablet",
+              "capsule",
+              "puff",
+              "patch",
+              "unit",
+              "other"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "instructions": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "clinician": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "reminders_enabled": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "discontinued"
+            ]
+          },
+          "is_current": {
+            "type": "boolean"
+          },
+          "discontinued_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "schedule": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MedicationSchedule"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MedicationInput": {
+        "type": "object",
+        "required": [
+          "name",
+          "dosage",
+          "unit",
+          "start_date",
+          "schedule"
+        ],
+        "description": "On PUT every field is optional; `status` only on PUT; omit `schedule` to keep it.",
+        "properties": {
+          "name": {
+            "type": "string",
+            "maxLength": 120
+          },
+          "dosage": {
+            "type": "string",
+            "maxLength": 30,
+            "example": "0.5"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "mg",
+              "mcg",
+              "g",
+              "ml",
+              "drops",
+              "tablet",
+              "capsule",
+              "puff",
+              "patch",
+              "unit",
+              "other"
+            ]
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date"
+          },
+          "end_date": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date"
+          },
+          "instructions": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1000
+          },
+          "clinician": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 120
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 2000
+          },
+          "reminders_enabled": {
+            "type": "boolean"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "active",
+              "paused",
+              "discontinued"
+            ]
+          },
+          "schedule": {
+            "$ref": "#/components/schemas/MedicationSchedule"
+          }
+        }
+      },
+      "MedicationLog": {
+        "type": "object",
+        "required": [
+          "id",
+          "medication_id",
+          "status",
+          "scheduled_at",
+          "taken_at",
+          "notes",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "medication_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "taken",
+              "skipped",
+              "missed",
+              "delayed"
+            ]
+          },
+          "scheduled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "taken_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MedicationLogInput": {
+        "type": "object",
+        "required": [
+          "status"
+        ],
+        "description": "taken_at required for taken/delayed, not allowed otherwise. Logging the same scheduled_at again updates that dose.",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "taken",
+              "skipped",
+              "missed",
+              "delayed"
+            ]
+          },
+          "scheduled_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "taken_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notes": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "maxLength": 1000
+          }
+        }
+      },
+      "MedicationExperience": {
+        "type": "object",
+        "required": [
+          "id",
+          "medication_id",
+          "kind",
+          "description",
+          "observed_on",
+          "created_at"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "medication_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "type": "string",
+            "enum": [
+              "benefit",
+              "side_effect",
+              "change",
+              "general"
+            ]
+          },
+          "description": {
+            "type": "string"
+          },
+          "observed_on": {
+            "type": "string",
+            "format": "date"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "MedicationExperienceInput": {
+        "type": "object",
+        "required": [
+          "kind",
+          "description"
+        ],
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "benefit",
+              "side_effect",
+              "change",
+              "general"
+            ]
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 2000
+          },
+          "observed_on": {
+            "type": "string",
+            "format": "date",
+            "description": "Defaults to today"
+          }
+        }
+      },
+      "Dose": {
+        "type": "object",
+        "required": [
+          "medication_id",
+          "scheduled_at",
+          "reminder",
+          "log"
+        ],
+        "description": "Ids only — the app shows names from its own list; reminder text stays generic.",
+        "properties": {
+          "medication_id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "scheduled_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reminder": {
+            "type": "boolean"
+          },
+          "log": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/MedicationLog"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        }
+      },
       "MoodEntry": {
         "type": "object",
         "required": [
@@ -3109,6 +4025,181 @@
       }
     },
     "responses": {
+      "SingleMedication": {
+        "description": "Medication",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/Medication"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "MedicationPage": {
+        "description": "Medications, newest first",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Medication"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SingleMedicationLog": {
+        "description": "Intake log",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/MedicationLog"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "MedicationLogPage": {
+        "description": "Intake history, newest first",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MedicationLog"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "SingleMedicationExperience": {
+        "description": "Experience",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "$ref": "#/components/schemas/MedicationExperience"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "MedicationExperiencePage": {
+        "description": "Experiences, newest first",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/MedicationExperience"
+                      }
+                    },
+                    "meta": {
+                      "$ref": "#/components/schemas/Meta"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
+      "DoseList": {
+        "description": "Scheduled doses",
+        "content": {
+          "application/json": {
+            "schema": {
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/SuccessEnvelope"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "data": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Dose"
+                      }
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      },
       "SingleMoodEntry": {
         "description": "check-in",
         "content": {

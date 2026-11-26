@@ -10,7 +10,7 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 
 ## Current status
 
-- **Active task:** T3.2 — awaiting user review (next: T4.1)
+- **Active task:** T4.1 — awaiting user review (next: T4.2)
 - **Last updated:** 2026-11-26
 
 ---
@@ -48,13 +48,13 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 | ID | Task | Status |
 |---|---|---|
 | T3.1 | Backend moods, symptoms (categories), sleep, edit/delete, `/tracking/overview`, insights (queued, non-diagnostic) | ✅ |
-| T3.2 | Flutter: daily check-in, mood selection, mood history, symptom & sleep tracking, insights | 🔍 |
+| T3.2 | Flutter: daily check-in, mood selection, mood history, symptom & sleep tracking, insights | ✅ |
 
 ## Phase 4 — Medication
 
 | ID | Task | Status |
 |---|---|---|
-| T4.1 | Backend medications (encrypted), schedules (timezone/DST-safe), intake logs, experiences, reminder scheduling that stops on discontinue | ⬜ |
+| T4.1 | Backend medications (encrypted), schedules (timezone/DST-safe), intake logs, experiences, reminder scheduling that stops on discontinue | 🔍 |
 | T4.2 | Flutter: medication list/add/details/schedule, intake history, experiences, local reminders (generic text) | ⬜ |
 
 ## Phase 5 — Private Journal
@@ -156,6 +156,8 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
 | 2026-11-26 | Tracking data belongs to the **account** (`user_id`), never the anonymous profile; community/moderation/identity can't use the module (arch test). Check-in = `mood` (required, 5 SRS options) + optional 1–10 score/anxiety/stress/energy + notes. Multiple check-ins per day allowed. Symptoms: admin-configurable categories (8 SRS examples seeded) + severity 1–10, optional duration (≤ 7 days) and notes. Sleep: duration (≤ 24 h) + optional quality; attributed to the wake-up day. Notes encrypted at rest; entries **hard-deleted** on delete; history filters by local days in the member's timezone (`user_preferences.timezone`, via Identity `AccountPreferences`). |
 | 2026-11-26 | Insights (FR-TRACK-005): recomputed by a queued, unique, after-commit job (account id only) after every change; stored encrypted as `{key, params}` and rendered in the reader's language, always with a "not a medical assessment" disclaimer. Rules (product choices — review): trends compare last 14 days vs the 14 before, need ≥ 3 entries in each, "higher/lower" at ≥ 0.75 points; most frequent mood (30 days, ≥ 3 entries, ties → most recent); sleep pattern = mood after ≥ 7 h vs < 6 h sleep (≥ 3 days each, worded as a pattern, never a cause); milestones = first check-in, 7-day streak, 30 check-ins (habit only, never "recovery"). Streak = consecutive local days, not broken until the day ends. |
 | 2026-11-26 | Mobile tracking: new **Track** tab (Community · Track · Me), built only when opened so no health data is fetched up front; tracking data lives only in memory (autoDispose providers, wiped on sign-out) — **no local cache**. Charts are drawn in-app (no chart package): 7-day bar strip + month mood calendar. Optional scales start empty ("Add") so skipping never records a made-up value. "Very sad" uses a frowning face (the Material "very dissatisfied" icon has X-eyes — inappropriate here). Sleep is logged as hours in half-hour steps; symptom duration as preset chips. Not yet: hiding tracking screens from the app switcher (needs a platform flag/plugin — revisit with journal in T5.2). |
+| 2026-11-26 | Medication (FR-MED-*): member-maintained records, **not prescriptions**; owned by the account. Encrypted: name, dosage, instructions, clinician, notes, log notes, experience text (so lists sort by date added; the app sorts by name). Units = fixed list. One schedule per medication: `daily` (1–8 times), `weekly` (ISO weekdays), `interval` (every 2–90 days from start), `as_needed`; temporary = start/end dates. Status active / paused / discontinued (discontinued_at stamped). Hard delete with schedule, logs, experiences. |
+| 2026-11-26 | Reminders: SRS asks for **local notifications** → the backend exposes `GET /medications/doses` (local days, ≤ 31) for **active** medications, ids only (no names), each with `reminder` and its log; the app schedules notifications from it (T4.2). Times are wall-clock in the member's **current** timezone (follows travel); DST: nonexistent times move forward, repeated times fire once. Paused/discontinued → no doses (SRS §13.3 #7). Logging the same scheduled dose again updates it; `taken_at` required for taken/delayed only. "Missed" is recorded by the member (no automatic marking yet — revisit with adherence in T6.1). |
 | 2026-11-12 | CI = GitHub Actions (backend + mobile workflows, path-filtered) + Dependabot. Deploy stages (SRS §14.3 steps 8–9) deferred to T11.2 (no hosting chosen yet). Android APK build runs on pushes only, not PRs. |
 | 2026-11-12 | Debug-only `/dev/design` showcase route; welcome "Get started" opens it until T1.3. Android debug build allows cleartext to local API; iOS `NSAllowsLocalNetworking`. |
 
@@ -308,3 +310,9 @@ Status legend: `⬜ todo` · `🚧 in progress` · `🔍 awaiting review` · `�
   - Screens: `TrackPage` (check-in card, streak, 7-day chart, averages, quick log, top symptoms, insights preview, history link), `CheckInPage` (mood picker + optional scales + private notes; edit & delete), `SymptomLogPage` (category tiles, severity, duration chips), `SleepLogPage` (hours slider, quality), `HistoryPage` (Moods/Symptoms/Sleep × month navigation, mood calendar), `InsightsPage` (observations, milestones, disclaimer). Widgets: `MoodPicker`, `ScaleField`, `WeekChart`, `MonthCalendar`, entry form actions. Slider theme. `ListPageScaffold` moved to `core/widgets` (shared by features).
   - Tests: 9 new flow tests (no tracking requests before the tab opens, first-check-in state, latest/streak/averages, check-in validation + body with skipped scales null, symptom, sleep defaults, history range query + edit + delete, insights + disclaimer, Arabic RTL). `flutter test` 116/116, analyze 0.
   - Verified on the emulator against the Docker API: empty Track tab → check-in (Good + mood score) → overview updates (streak 1, chart bar, average 5) and the server-computed insight appears. Screenshots in `docs/screenshots/t3.2/`.
+- **T3.2 approved.** Started T4.1.
+- **T4.1 finished** (awaiting review):
+  - New `app/Modules/Medication`: migration (medications, schedules, logs with one-per-dose partial unique index, experiences; CHECKs), enums (status, unit, schedule type, intake status, experience kind), models (encrypted casts, `ownedBy`) + factories, `DoseCalendar` (timezone/DST-safe expansion), actions `SaveMedication`, `ListMedications`, `BuildDoses`, `RecordIntake`, `FindMedication` (owner-scoped 404s).
+  - Endpoints (SRS §8.6 + extras): `GET|POST /medications`, `GET|PUT|DELETE /medications/{id}`, `GET|POST /medications/{id}/logs`, `DELETE …/logs/{logId}`, `GET|POST /medications/{id}/experiences`, `DELETE …/experiences/{experienceId}`, `GET /medications/doses`. OpenAPI: 12 operations, `Medication` tag.
+  - Tests: 45 new (every schedule type, SRS §13.3 #1 cross-user 404 on every route, #7 discontinue/pause stops doses, #9 invalid records, encryption at rest, current vs past, partial edit, cascade delete, intake upsert & validation, experiences, timezone-aware doses, weekdays/interval/temporary, DST spring-forward & fall-back incl. nonexistent/repeated times, timezone change).
+  - Verified: `composer ci` ✔ (pint, phpstan 0, pest 389/389, audit); live smoke test (doses listed, intake recorded, discontinue → no doses, name encrypted in Postgres).
