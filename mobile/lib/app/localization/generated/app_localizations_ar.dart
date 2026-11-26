@@ -901,4 +901,265 @@ class AppLocalizationsAr extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get navTrack => 'متابعتي';
+
+  @override
+  String get trackTitle => 'تسجيلاتك';
+
+  @override
+  String get trackPrivate => 'لا يراه أحد غيرك، ولا يُشارك مع المجتمع أبدًا.';
+
+  @override
+  String get checkInPrompt => 'كيف تشعر اليوم؟';
+
+  @override
+  String get checkInPromptBody => 'تسجيل سريع يساعدك على ملاحظة الأنماط مع الوقت.';
+
+  @override
+  String get checkInAction => 'سجّل الآن';
+
+  @override
+  String get checkInAgain => 'أضف تسجيلًا آخر';
+
+  @override
+  String todayYouFelt(String mood) {
+    return 'آخر تسجيل: $mood';
+  }
+
+  @override
+  String streakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count يوم متتالٍ',
+      many: '$count يومًا متتاليًا',
+      few: '$count أيام متتالية',
+      two: 'يومان متتاليان',
+      one: 'يوم واحد متتالٍ',
+      zero: 'لا توجد سلسلة بعد',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String totalCheckIns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count تسجيل',
+      many: '$count تسجيلًا',
+      few: '$count تسجيلات',
+      two: 'تسجيلان',
+      one: 'تسجيل واحد',
+      zero: 'لا تسجيلات',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lastSevenDays => 'آخر 7 أيام';
+
+  @override
+  String get averagesTitle => 'متوسطات 7 أيام';
+
+  @override
+  String get avgMood => 'المزاج';
+
+  @override
+  String get avgStress => 'التوتر';
+
+  @override
+  String get avgSleep => 'النوم';
+
+  @override
+  String hoursShort(String hours) {
+    return '$hours س';
+  }
+
+  @override
+  String get noValue => '—';
+
+  @override
+  String get logSymptom => 'سجّل عَرَضًا';
+
+  @override
+  String get logSleep => 'سجّل نومك';
+
+  @override
+  String get historyTitle => 'السجل';
+
+  @override
+  String get seeHistory => 'عرض السجل';
+
+  @override
+  String get insightsTitle => 'ملاحظات';
+
+  @override
+  String get seeAllInsights => 'عرض كل الملاحظات';
+
+  @override
+  String get insightsEmpty => 'واصل التسجيل — ستظهر الملاحظات عندما تتوفر بيانات كافية.';
+
+  @override
+  String get insightsRefreshing => 'يجري تجهيز ملاحظاتك…';
+
+  @override
+  String get topSymptomsTitle => 'الأعراض الأكثر تسجيلًا (30 يومًا)';
+
+  @override
+  String get checkInTitle => 'تسجيل يومي';
+
+  @override
+  String get checkInEditTitle => 'تعديل التسجيل';
+
+  @override
+  String get checkInBadge => 'خاص';
+
+  @override
+  String get moodQuestion => 'بشكل عام، كيف تشعر؟';
+
+  @override
+  String get moodRequired => 'يرجى اختيار شعورك.';
+
+  @override
+  String get moodVerySad => 'حزين جدًا';
+
+  @override
+  String get moodSad => 'حزين';
+
+  @override
+  String get moodNeutral => 'محايد';
+
+  @override
+  String get moodGood => 'جيد';
+
+  @override
+  String get moodVeryGood => 'جيد جدًا';
+
+  @override
+  String get detailsOptional => 'تفاصيل إضافية (اختياري)';
+
+  @override
+  String get scaleMood => 'درجة المزاج';
+
+  @override
+  String get scaleAnxiety => 'القلق';
+
+  @override
+  String get scaleStress => 'التوتر';
+
+  @override
+  String get scaleEnergy => 'الطاقة';
+
+  @override
+  String get scaleSleepQuality => 'جودة النوم';
+
+  @override
+  String get scaleSeverity => 'ما مدى شدته؟';
+
+  @override
+  String get scaleAdd => 'إضافة';
+
+  @override
+  String scaleClear(String label) {
+    return 'مسح $label';
+  }
+
+  @override
+  String scaleValue(int value) {
+    return '$value من 10';
+  }
+
+  @override
+  String get privateNotes => 'ملاحظات خاصة';
+
+  @override
+  String get privateNotesHint => 'أي شيء تريد تذكّره (لا يراه أحد غيرك)';
+
+  @override
+  String get saveEntry => 'حفظ';
+
+  @override
+  String get entrySaved => 'تم الحفظ.';
+
+  @override
+  String get deleteEntry => 'حذف السجل';
+
+  @override
+  String get deleteEntryConfirm => 'هل تريد حذف هذا السجل؟ لا يمكن التراجع عن ذلك.';
+
+  @override
+  String get entryDeleted => 'تم حذف السجل.';
+
+  @override
+  String get symptomTitle => 'تسجيل عَرَض';
+
+  @override
+  String get symptomEditTitle => 'تعديل العَرَض';
+
+  @override
+  String get symptomWhich => 'ما الذي تلاحظه؟';
+
+  @override
+  String get symptomRequired => 'يرجى اختيار عَرَض.';
+
+  @override
+  String get durationTitle => 'كم استمر؟ (اختياري)';
+
+  @override
+  String durationMinutes(int count) {
+    return '$count د';
+  }
+
+  @override
+  String durationHours(int count) {
+    return '$count س';
+  }
+
+  @override
+  String get durationNotSure => 'لست متأكدًا';
+
+  @override
+  String get sleepTitle => 'تسجيل النوم';
+
+  @override
+  String get sleepEditTitle => 'تعديل النوم';
+
+  @override
+  String get sleepHowLong => 'كم ساعة نمت؟';
+
+  @override
+  String sleepHoursValue(String hours) {
+    return '$hours ساعات';
+  }
+
+  @override
+  String get historyMoods => 'المزاج';
+
+  @override
+  String get historySymptoms => 'الأعراض';
+
+  @override
+  String get historySleep => 'النوم';
+
+  @override
+  String get historyEmpty => 'لا يوجد تسجيل في هذا الشهر.';
+
+  @override
+  String get previousMonth => 'الشهر السابق';
+
+  @override
+  String get nextMonth => 'الشهر التالي';
+
+  @override
+  String severityValue(int value) {
+    return 'الشدة $value/10';
+  }
+
+  @override
+  String qualityValue(int value) {
+    return 'الجودة $value/10';
+  }
 }

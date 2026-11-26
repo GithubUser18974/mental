@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindful/app/localization/generated/app_localizations.dart';
-import 'package:mindful/features/community/presentation/pages/list_page_scaffold.dart';
+import 'package:mindful/core/widgets/list_page_scaffold.dart';
 import 'package:mindful/features/community/presentation/providers/social_providers.dart';
 import 'package:mindful/features/community/presentation/widgets/paged_post_sliver.dart';
 

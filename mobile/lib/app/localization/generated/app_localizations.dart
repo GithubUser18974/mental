@@ -1682,6 +1682,444 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'{count, plural, =1{1 post} other{{count} posts}}'**
   String hashtagPostsCount(int count);
+
+  /// No description provided for @navTrack.
+  ///
+  /// In en, this message translates to:
+  /// **'Track'**
+  String get navTrack;
+
+  /// No description provided for @trackTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Your check-ins'**
+  String get trackTitle;
+
+  /// No description provided for @trackPrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Only you can see this. It\'s never shared with the community.'**
+  String get trackPrivate;
+
+  /// No description provided for @checkInPrompt.
+  ///
+  /// In en, this message translates to:
+  /// **'How are you feeling today?'**
+  String get checkInPrompt;
+
+  /// No description provided for @checkInPromptBody.
+  ///
+  /// In en, this message translates to:
+  /// **'A quick check-in helps you notice patterns over time.'**
+  String get checkInPromptBody;
+
+  /// No description provided for @checkInAction.
+  ///
+  /// In en, this message translates to:
+  /// **'Check in'**
+  String get checkInAction;
+
+  /// No description provided for @checkInAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Add another check-in'**
+  String get checkInAgain;
+
+  /// No description provided for @todayYouFelt.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest: {mood}'**
+  String todayYouFelt(String mood);
+
+  /// No description provided for @streakDays.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =0{No streak yet} =1{1-day streak} other{{count}-day streak}}'**
+  String streakDays(int count);
+
+  /// No description provided for @totalCheckIns.
+  ///
+  /// In en, this message translates to:
+  /// **'{count, plural, =1{1 check-in} other{{count} check-ins}}'**
+  String totalCheckIns(int count);
+
+  /// No description provided for @lastSevenDays.
+  ///
+  /// In en, this message translates to:
+  /// **'Last 7 days'**
+  String get lastSevenDays;
+
+  /// No description provided for @averagesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'7-day averages'**
+  String get averagesTitle;
+
+  /// No description provided for @avgMood.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood'**
+  String get avgMood;
+
+  /// No description provided for @avgStress.
+  ///
+  /// In en, this message translates to:
+  /// **'Stress'**
+  String get avgStress;
+
+  /// No description provided for @avgSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get avgSleep;
+
+  /// No description provided for @hoursShort.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} h'**
+  String hoursShort(String hours);
+
+  /// No description provided for @noValue.
+  ///
+  /// In en, this message translates to:
+  /// **'—'**
+  String get noValue;
+
+  /// No description provided for @logSymptom.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a symptom'**
+  String get logSymptom;
+
+  /// No description provided for @logSleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Log sleep'**
+  String get logSleep;
+
+  /// No description provided for @historyTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get historyTitle;
+
+  /// No description provided for @seeHistory.
+  ///
+  /// In en, this message translates to:
+  /// **'See history'**
+  String get seeHistory;
+
+  /// No description provided for @insightsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Insights'**
+  String get insightsTitle;
+
+  /// No description provided for @seeAllInsights.
+  ///
+  /// In en, this message translates to:
+  /// **'See all insights'**
+  String get seeAllInsights;
+
+  /// No description provided for @insightsEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Keep checking in — observations appear once there\'s enough to notice.'**
+  String get insightsEmpty;
+
+  /// No description provided for @insightsRefreshing.
+  ///
+  /// In en, this message translates to:
+  /// **'Your insights are being prepared…'**
+  String get insightsRefreshing;
+
+  /// No description provided for @topSymptomsTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Most recorded symptoms (30 days)'**
+  String get topSymptomsTitle;
+
+  /// No description provided for @checkInTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Check-in'**
+  String get checkInTitle;
+
+  /// No description provided for @checkInEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit check-in'**
+  String get checkInEditTitle;
+
+  /// No description provided for @checkInBadge.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get checkInBadge;
+
+  /// No description provided for @moodQuestion.
+  ///
+  /// In en, this message translates to:
+  /// **'Overall, how do you feel?'**
+  String get moodQuestion;
+
+  /// No description provided for @moodRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose how you feel.'**
+  String get moodRequired;
+
+  /// No description provided for @moodVerySad.
+  ///
+  /// In en, this message translates to:
+  /// **'Very sad'**
+  String get moodVerySad;
+
+  /// No description provided for @moodSad.
+  ///
+  /// In en, this message translates to:
+  /// **'Sad'**
+  String get moodSad;
+
+  /// No description provided for @moodNeutral.
+  ///
+  /// In en, this message translates to:
+  /// **'Neutral'**
+  String get moodNeutral;
+
+  /// No description provided for @moodGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Good'**
+  String get moodGood;
+
+  /// No description provided for @moodVeryGood.
+  ///
+  /// In en, this message translates to:
+  /// **'Very good'**
+  String get moodVeryGood;
+
+  /// No description provided for @detailsOptional.
+  ///
+  /// In en, this message translates to:
+  /// **'More detail (optional)'**
+  String get detailsOptional;
+
+  /// No description provided for @scaleMood.
+  ///
+  /// In en, this message translates to:
+  /// **'Mood score'**
+  String get scaleMood;
+
+  /// No description provided for @scaleAnxiety.
+  ///
+  /// In en, this message translates to:
+  /// **'Anxiety'**
+  String get scaleAnxiety;
+
+  /// No description provided for @scaleStress.
+  ///
+  /// In en, this message translates to:
+  /// **'Stress'**
+  String get scaleStress;
+
+  /// No description provided for @scaleEnergy.
+  ///
+  /// In en, this message translates to:
+  /// **'Energy'**
+  String get scaleEnergy;
+
+  /// No description provided for @scaleSleepQuality.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep quality'**
+  String get scaleSleepQuality;
+
+  /// No description provided for @scaleSeverity.
+  ///
+  /// In en, this message translates to:
+  /// **'How strong was it?'**
+  String get scaleSeverity;
+
+  /// No description provided for @scaleAdd.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get scaleAdd;
+
+  /// No description provided for @scaleClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear {label}'**
+  String scaleClear(String label);
+
+  /// No description provided for @scaleValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{value} of 10'**
+  String scaleValue(int value);
+
+  /// No description provided for @privateNotes.
+  ///
+  /// In en, this message translates to:
+  /// **'Private notes'**
+  String get privateNotes;
+
+  /// No description provided for @privateNotesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Anything you want to remember (only you can see this)'**
+  String get privateNotesHint;
+
+  /// No description provided for @saveEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get saveEntry;
+
+  /// No description provided for @entrySaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Saved.'**
+  String get entrySaved;
+
+  /// No description provided for @deleteEntry.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete entry'**
+  String get deleteEntry;
+
+  /// No description provided for @deleteEntryConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete this entry? This can\'t be undone.'**
+  String get deleteEntryConfirm;
+
+  /// No description provided for @entryDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Entry deleted.'**
+  String get entryDeleted;
+
+  /// No description provided for @symptomTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log a symptom'**
+  String get symptomTitle;
+
+  /// No description provided for @symptomEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit symptom'**
+  String get symptomEditTitle;
+
+  /// No description provided for @symptomWhich.
+  ///
+  /// In en, this message translates to:
+  /// **'What are you noticing?'**
+  String get symptomWhich;
+
+  /// No description provided for @symptomRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please choose a symptom.'**
+  String get symptomRequired;
+
+  /// No description provided for @durationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'How long did it last? (optional)'**
+  String get durationTitle;
+
+  /// No description provided for @durationMinutes.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min'**
+  String durationMinutes(int count);
+
+  /// No description provided for @durationHours.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} h'**
+  String durationHours(int count);
+
+  /// No description provided for @durationNotSure.
+  ///
+  /// In en, this message translates to:
+  /// **'Not sure'**
+  String get durationNotSure;
+
+  /// No description provided for @sleepTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Log sleep'**
+  String get sleepTitle;
+
+  /// No description provided for @sleepEditTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit sleep'**
+  String get sleepEditTitle;
+
+  /// No description provided for @sleepHowLong.
+  ///
+  /// In en, this message translates to:
+  /// **'How long did you sleep?'**
+  String get sleepHowLong;
+
+  /// No description provided for @sleepHoursValue.
+  ///
+  /// In en, this message translates to:
+  /// **'{hours} hours'**
+  String sleepHoursValue(String hours);
+
+  /// No description provided for @historyMoods.
+  ///
+  /// In en, this message translates to:
+  /// **'Moods'**
+  String get historyMoods;
+
+  /// No description provided for @historySymptoms.
+  ///
+  /// In en, this message translates to:
+  /// **'Symptoms'**
+  String get historySymptoms;
+
+  /// No description provided for @historySleep.
+  ///
+  /// In en, this message translates to:
+  /// **'Sleep'**
+  String get historySleep;
+
+  /// No description provided for @historyEmpty.
+  ///
+  /// In en, this message translates to:
+  /// **'Nothing recorded this month.'**
+  String get historyEmpty;
+
+  /// No description provided for @previousMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Previous month'**
+  String get previousMonth;
+
+  /// No description provided for @nextMonth.
+  ///
+  /// In en, this message translates to:
+  /// **'Next month'**
+  String get nextMonth;
+
+  /// No description provided for @severityValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Severity {value}/10'**
+  String severityValue(int value);
+
+  /// No description provided for @qualityValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Quality {value}/10'**
+  String qualityValue(int value);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

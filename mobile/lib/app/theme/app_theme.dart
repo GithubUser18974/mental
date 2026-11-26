@@ -102,6 +102,15 @@ abstract final class AppTheme {
           borderRadius: BorderRadius.vertical(top: Radius.circular(AppRadius.xl)),
         ),
       ),
+      sliderTheme: SliderThemeData(
+        activeTrackColor: p.primary,
+        inactiveTrackColor: p.primarySoft,
+        thumbColor: p.primary,
+        overlayColor: p.primary.withValues(alpha: 0.12),
+        valueIndicatorColor: p.primary,
+        activeTickMarkColor: p.onPrimary.withValues(alpha: 0.6),
+        inactiveTickMarkColor: p.primaryLight,
+      ),
       navigationBarTheme: NavigationBarThemeData(
         backgroundColor: p.surface,
         surfaceTintColor: Colors.transparent,

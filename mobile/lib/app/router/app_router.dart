@@ -22,6 +22,11 @@ import 'package:mindful/features/onboarding/presentation/pages/onboarding_intro_
 import 'package:mindful/features/onboarding/presentation/pages/welcome_page.dart';
 import 'package:mindful/features/profile/presentation/pages/profile_setup_page.dart';
 import 'package:mindful/features/profile/presentation/providers/current_profile_provider.dart';
+import 'package:mindful/features/tracking/presentation/pages/check_in_page.dart';
+import 'package:mindful/features/tracking/presentation/pages/history_page.dart';
+import 'package:mindful/features/tracking/presentation/pages/insights_page.dart';
+import 'package:mindful/features/tracking/presentation/pages/sleep_log_page.dart';
+import 'package:mindful/features/tracking/presentation/pages/symptom_log_page.dart';
 
 /// Snapshot of what the guard needs; a change triggers GoRouter's redirect.
 typedef _GuardState = ({AuthStatus status, SetupStatus setup});
@@ -88,6 +93,23 @@ final routerProvider = Provider<GoRouter>((ref) {
         ),
       ),
       GoRoute(path: AppRoutes.search, builder: (_, _) => const SearchPage()),
+      GoRoute(path: AppRoutes.trackCheckIn, builder: (_, _) => const CheckInPage()),
+      GoRoute(
+        path: AppRoutes.trackCheckInEdit,
+        builder: (_, state) => CheckInPage(entryId: state.pathParameters['id']),
+      ),
+      GoRoute(path: AppRoutes.trackSymptom, builder: (_, _) => const SymptomLogPage()),
+      GoRoute(
+        path: AppRoutes.trackSymptomEdit,
+        builder: (_, state) => SymptomLogPage(entryId: state.pathParameters['id']),
+      ),
+      GoRoute(path: AppRoutes.trackSleep, builder: (_, _) => const SleepLogPage()),
+      GoRoute(
+        path: AppRoutes.trackSleepEdit,
+        builder: (_, state) => SleepLogPage(entryId: state.pathParameters['id']),
+      ),
+      GoRoute(path: AppRoutes.trackHistory, builder: (_, _) => const HistoryPage()),
+      GoRoute(path: AppRoutes.trackInsights, builder: (_, _) => const InsightsPage()),
       GoRoute(
         path: AppRoutes.hashtag,
         builder: (_, state) => PostListPage.hashtag(state.pathParameters['tag'] ?? ''),

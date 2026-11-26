@@ -3,9 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mindful/app/localization/generated/app_localizations.dart';
 import 'package:mindful/app/theme/app_dimens.dart';
 import 'package:mindful/core/widgets/app_snack_bar.dart';
+import 'package:mindful/core/widgets/list_page_scaffold.dart';
 import 'package:mindful/core/widgets/state_views.dart';
 import 'package:mindful/features/community/domain/entities/social.dart';
-import 'package:mindful/features/community/presentation/pages/list_page_scaffold.dart';
 import 'package:mindful/features/community/presentation/providers/social_providers.dart';
 import 'package:mindful/features/community/presentation/widgets/member_tile.dart';
 

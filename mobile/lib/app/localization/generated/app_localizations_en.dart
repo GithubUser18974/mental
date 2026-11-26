@@ -889,4 +889,259 @@ class AppLocalizationsEn extends AppLocalizations {
     );
     return '$_temp0';
   }
+
+  @override
+  String get navTrack => 'Track';
+
+  @override
+  String get trackTitle => 'Your check-ins';
+
+  @override
+  String get trackPrivate => 'Only you can see this. It\'s never shared with the community.';
+
+  @override
+  String get checkInPrompt => 'How are you feeling today?';
+
+  @override
+  String get checkInPromptBody => 'A quick check-in helps you notice patterns over time.';
+
+  @override
+  String get checkInAction => 'Check in';
+
+  @override
+  String get checkInAgain => 'Add another check-in';
+
+  @override
+  String todayYouFelt(String mood) {
+    return 'Latest: $mood';
+  }
+
+  @override
+  String streakDays(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count-day streak',
+      one: '1-day streak',
+      zero: 'No streak yet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String totalCheckIns(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count check-ins',
+      one: '1 check-in',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lastSevenDays => 'Last 7 days';
+
+  @override
+  String get averagesTitle => '7-day averages';
+
+  @override
+  String get avgMood => 'Mood';
+
+  @override
+  String get avgStress => 'Stress';
+
+  @override
+  String get avgSleep => 'Sleep';
+
+  @override
+  String hoursShort(String hours) {
+    return '$hours h';
+  }
+
+  @override
+  String get noValue => '—';
+
+  @override
+  String get logSymptom => 'Log a symptom';
+
+  @override
+  String get logSleep => 'Log sleep';
+
+  @override
+  String get historyTitle => 'History';
+
+  @override
+  String get seeHistory => 'See history';
+
+  @override
+  String get insightsTitle => 'Insights';
+
+  @override
+  String get seeAllInsights => 'See all insights';
+
+  @override
+  String get insightsEmpty =>
+      'Keep checking in — observations appear once there\'s enough to notice.';
+
+  @override
+  String get insightsRefreshing => 'Your insights are being prepared…';
+
+  @override
+  String get topSymptomsTitle => 'Most recorded symptoms (30 days)';
+
+  @override
+  String get checkInTitle => 'Check-in';
+
+  @override
+  String get checkInEditTitle => 'Edit check-in';
+
+  @override
+  String get checkInBadge => 'Private';
+
+  @override
+  String get moodQuestion => 'Overall, how do you feel?';
+
+  @override
+  String get moodRequired => 'Please choose how you feel.';
+
+  @override
+  String get moodVerySad => 'Very sad';
+
+  @override
+  String get moodSad => 'Sad';
+
+  @override
+  String get moodNeutral => 'Neutral';
+
+  @override
+  String get moodGood => 'Good';
+
+  @override
+  String get moodVeryGood => 'Very good';
+
+  @override
+  String get detailsOptional => 'More detail (optional)';
+
+  @override
+  String get scaleMood => 'Mood score';
+
+  @override
+  String get scaleAnxiety => 'Anxiety';
+
+  @override
+  String get scaleStress => 'Stress';
+
+  @override
+  String get scaleEnergy => 'Energy';
+
+  @override
+  String get scaleSleepQuality => 'Sleep quality';
+
+  @override
+  String get scaleSeverity => 'How strong was it?';
+
+  @override
+  String get scaleAdd => 'Add';
+
+  @override
+  String scaleClear(String label) {
+    return 'Clear $label';
+  }
+
+  @override
+  String scaleValue(int value) {
+    return '$value of 10';
+  }
+
+  @override
+  String get privateNotes => 'Private notes';
+
+  @override
+  String get privateNotesHint => 'Anything you want to remember (only you can see this)';
+
+  @override
+  String get saveEntry => 'Save';
+
+  @override
+  String get entrySaved => 'Saved.';
+
+  @override
+  String get deleteEntry => 'Delete entry';
+
+  @override
+  String get deleteEntryConfirm => 'Delete this entry? This can\'t be undone.';
+
+  @override
+  String get entryDeleted => 'Entry deleted.';
+
+  @override
+  String get symptomTitle => 'Log a symptom';
+
+  @override
+  String get symptomEditTitle => 'Edit symptom';
+
+  @override
+  String get symptomWhich => 'What are you noticing?';
+
+  @override
+  String get symptomRequired => 'Please choose a symptom.';
+
+  @override
+  String get durationTitle => 'How long did it last? (optional)';
+
+  @override
+  String durationMinutes(int count) {
+    return '$count min';
+  }
+
+  @override
+  String durationHours(int count) {
+    return '$count h';
+  }
+
+  @override
+  String get durationNotSure => 'Not sure';
+
+  @override
+  String get sleepTitle => 'Log sleep';
+
+  @override
+  String get sleepEditTitle => 'Edit sleep';
+
+  @override
+  String get sleepHowLong => 'How long did you sleep?';
+
+  @override
+  String sleepHoursValue(String hours) {
+    return '$hours hours';
+  }
+
+  @override
+  String get historyMoods => 'Moods';
+
+  @override
+  String get historySymptoms => 'Symptoms';
+
+  @override
+  String get historySleep => 'Sleep';
+
+  @override
+  String get historyEmpty => 'Nothing recorded this month.';
+
+  @override
+  String get previousMonth => 'Previous month';
+
+  @override
+  String get nextMonth => 'Next month';
+
+  @override
+  String severityValue(int value) {
+    return 'Severity $value/10';
+  }
+
+  @override
+  String qualityValue(int value) {
+    return 'Quality $value/10';
+  }
 }

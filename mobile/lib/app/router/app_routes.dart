@@ -32,6 +32,22 @@ abstract final class AppRoutes {
   static const String search = '/search';
   static const String hashtag = '/hashtags/:tag';
 
+  /// Private tracking (FR-TRACK-*). Paths carry opaque entry ids only — never health data.
+  static const String trackCheckIn = '/track/check-in';
+  static const String trackCheckInEdit = '/track/check-in/:id';
+  static const String trackSymptom = '/track/symptom';
+  static const String trackSymptomEdit = '/track/symptom/:id';
+  static const String trackSleep = '/track/sleep';
+  static const String trackSleepEdit = '/track/sleep/:id';
+  static const String trackHistory = '/track/history';
+  static const String trackInsights = '/track/insights';
+
+  static String trackCheckInPath(String id) => '/track/check-in/$id';
+
+  static String trackSymptomPath(String id) => '/track/symptom/$id';
+
+  static String trackSleepPath(String id) => '/track/sleep/$id';
+
   static String profilePath(String username) => '/profiles/${Uri.encodeComponent(username)}';
 
   static String membersPath(String kind) => '/members/$kind';
